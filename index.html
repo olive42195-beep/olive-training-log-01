@@ -274,6 +274,27 @@ input[type=range]{flex:1;accent-color:var(--primary);}
     </div>
   </div>
 
+  <!-- STEP2.5 目標タイム・シューズ -->
+  <div class="ai-step">
+    <div class="ai-step-title">🎯 STEP 2.5｜目標と使用シューズ（任意）</div>
+    <div class="form-group">
+      <label>目標タイム・目標（自由に入力してください）</label>
+      <input type="text" id="ai-goal" placeholder="例：サブ4 / 完走 / 2時間28分 / まだ決まっていない"
+        style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;font-size:14px;">
+      <p style="font-size:11px;color:var(--text3);margin-top:4px">どんな表現でも構いません。AIが内容を読み取ります。</p>
+    </div>
+    <div class="form-group" style="margin-bottom:0">
+      <label>今日使用したシューズの種類</label>
+      <div class="chip-group" id="chips-shoe">
+        <button class="chip" onclick="selectChip(this,'shoe')">🟢 ジョグ用（クッション重視）</button>
+        <button class="chip" onclick="selectChip(this,'shoe')">🔵 ペース・テンポ走用（安定性重視）</button>
+        <button class="chip" onclick="selectChip(this,'shoe')">🟡 スピード練習用（薄底・軽量反発）</button>
+        <button class="chip" onclick="selectChip(this,'shoe')">🔴 レース用（カーボンプレート）</button>
+        <button class="chip" onclick="selectChip(this,'shoe')">未使用・未選択</button>
+      </div>
+    </div>
+  </div>
+
   <!-- STEP3 練習スタイル -->
   <div class="ai-step">
     <div class="ai-step-title">⚖️ STEP 3｜今の練習スタイル</div>
@@ -400,7 +421,7 @@ const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx-7fXWl-xFx4JtctN
 // ============================================================
 // 選択状態管理
 // ============================================================
-const selections = { mood:'', sleep:'', fatigue:'', pain:'', activities:[], trainingStyle:'', weekBalance:'', strengthFreq:'', topics:[], replyLength:'' };
+const selections = { mood:'', sleep:'', fatigue:'', pain:'', activities:[], trainingStyle:'', weekBalance:'', strengthFreq:'', topics:[], replyLength:'', shoe:'' };
 const imgData = [null, null, null, null];
 let currentImgSlot = 0;
 let pendingReply = null;
@@ -480,6 +501,8 @@ function submitAIConsult() {
     strengthFreq:  selections.strengthFreq,
     topics:        selections.topics,
     replyLength:   selections.replyLength,
+    goalTime:      document.getElementById('ai-goal').value.trim(),
+    shoeType:      selections.shoe,
     memo:          document.getElementById('ai-memo').value,
     images:        images
   };
@@ -540,6 +563,7 @@ function resetAIForm() {
   document.querySelectorAll('.chip.selected,.multi-chip.selected').forEach(b => b.classList.remove('selected'));
   document.getElementById('ai-distance').value = '';
   document.getElementById('ai-duration').value = '';
+  document.getElementById('ai-goal').value = '';
   document.getElementById('ai-memo').value = '';
   imgData.fill(null);
   [0,1,2,3].forEach(i => { document.getElementById('slot-'+i).innerHTML = '<span class="plus">＋</span>'; });
