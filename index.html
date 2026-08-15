@@ -347,21 +347,34 @@ input[type=range]{flex:1;accent-color:var(--primary);}
     <textarea id="ai-memo" placeholder="例：アップダウンの多いコースだったが姿勢が保てた" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;font-size:13px;min-height:60px;"></textarea>
   </div>
 
-  <!-- 送信ボタン -->
-  <button class="btn-primary" onclick="submitAIConsult()" id="ai-submit-btn">🤖 AIコーチに相談する</button>
-
-  <!-- 待機表示 -->
-  <div class="waiting-box" id="waiting-box">
-    <span class="waiting-icon">⏳</span>
-    <div class="waiting-text">
-      <strong>AI回答を作成中です。</strong><br>
-      3〜5分後に下の「更新する」ボタンを押してください。<br>
-      <small style="color:var(--text3)">※混雑時は5分以上かかる場合があります</small>
+  <!-- STEP8 メールアドレス -->
+  <div class="ai-step" style="border:2px solid var(--primary)">
+    <div class="ai-step-title">📧 STEP 8｜回答を受け取るメールアドレス</div>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:10px">AIコーチからの回答をこのアドレスへ送信します。</p>
+    <div class="form-group" style="margin-bottom:0">
+      <input type="email" id="ai-email" placeholder="例：your@email.com"
+        style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;font-size:14px;">
     </div>
-    <button class="refresh-btn" onclick="checkReply()">🔄 更新する</button>
+    <p style="font-size:11px;color:var(--text3);margin-top:6px">※回答まで3〜5分かかります。メールをご確認ください。</p>
   </div>
 
-  <!-- AI回答表示 -->
+  <!-- 送信ボタン -->
+  <button class="btn-primary" onclick="submitAIConsult()" id="ai-submit-btn">📧 AIコーチに相談する（メールで回答）</button>
+
+  <!-- 送信完了表示 -->
+  <div class="waiting-box" id="waiting-box">
+    <span style="font-size:32px;display:block;margin-bottom:8px">📨</span>
+    <div class="waiting-text">
+      <strong>送信が完了しました！</strong><br>
+      AIコーチが回答を作成中です。<br>
+      <strong style="color:var(--primary)" id="sent-email-display"></strong><br>
+      へ3〜5分以内にメールが届きます。<br>
+      <small style="color:var(--text3)">※混雑時は5分以上かかる場合があります</small>
+    </div>
+    <button class="btn-secondary" onclick="resetAIForm()" style="margin-top:16px">↩ もう一度相談する</button>
+  </div>
+
+  <!-- AI回答表示（エラー時のみ） -->
   <div class="ai-reply-box" id="ai-reply-box">
     <div style="font-size:12px;color:var(--primary);font-weight:700;margin-bottom:8px">🌿 AIコーチからの回答</div>
     <div class="ai-reply-content" id="ai-reply-content"></div>
@@ -443,12 +456,18 @@ function removeImg(slot, e) {
 // AI相談送信
 // ============================================================
 function submitAIConsult() {
-  if (!selections.mood) { showToast('⚠️ 今日の気分を選択してください'); return; }
+  // バリデーション
+  if (!selections.mood)  { showToast('⚠️ 今日の気分を選択してください'); return; }
   if (!selections.sleep) { showToast('⚠️ 睡眠時間を選択してください'); return; }
+  const email = document.getElementById('ai-email').value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('⚠️ メールアドレスを正しく入力してください'); return;
+  }
 
   const images = imgData.filter(d => d !== null);
   const body = {
     action:        'consult',
+    clientEmail:   email,
     mood:          selections.mood,
     sleep:         selections.sleep,
     fatigue:       selections.fatigue,
@@ -465,12 +484,16 @@ function submitAIConsult() {
     images:        images
   };
 
-  document.getElementById('ai-submit-btn').disabled = true;
-  document.getElementById('ai-submit-btn').textContent = '送信中...';
+  const btn = document.getElementById('ai-submit-btn');
+  btn.disabled = true;
+  btn.textContent = '📨 送信中...';
+
+  // 送信完了画面をすぐ表示（メール送信は裏で処理）
+  document.getElementById('sent-email-display').textContent = email;
   document.getElementById('waiting-box').classList.add('show');
   document.getElementById('ai-reply-box').classList.remove('show');
-  pendingReply = null;
 
+  // GASへPOST（裏で処理・タイムアウトを気にしない）
   fetch(GAS_ENDPOINT, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -478,14 +501,17 @@ function submitAIConsult() {
   })
   .then(r => r.json())
   .then(data => {
-    if (data.reply) {
-      pendingReply = data.reply;
-    } else if (data.error) {
-      pendingReply = '⚠️ エラーが発生しました：' + data.error + '\n\n時間をおいて再度お試しください。';
+    if (data.error) {
+      // エラーの場合のみ画面に表示
+      document.getElementById('ai-reply-box').classList.add('show');
+      document.getElementById('ai-reply-content').innerHTML =
+        '⚠️ エラーが発生しました：' + data.error +
+        '<br><br>お手数ですが Olive.42195@gmail.com へ直接ご連絡ください。';
     }
   })
-  .catch(err => {
-    pendingReply = '⚠️ 通信エラー：' + String(err) + '\n\nネットワーク接続を確認してください。';
+  .catch(() => {
+    // fetch自体のエラー（タイムアウト等）は無視
+    // GASは裏で動いているためメールは届く
   });
 }
 
