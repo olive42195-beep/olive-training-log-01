@@ -416,7 +416,7 @@ input[type=range]{flex:1;accent-color:var(--primary);}
 // ============================================================
 // ★ GAS Web App URL をここに貼り付けてください ★
 // ============================================================
-const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzdff3XIZppb9hNfsvRljub-P5b4E0QUbu196F6FTp4jyKmkpanku6b2716U0u-9PxDKA/exec';
+const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzLVZlTscrmVjsrDjsk3qXg5gH-zOFabtjusWe67bAXKKR7Er_G5U9R_SKJCDH2ko7kjA/exec';
 
 // ============================================================
 // 選択状態管理
@@ -516,25 +516,26 @@ function submitAIConsult() {
   document.getElementById('waiting-box').classList.add('show');
   document.getElementById('ai-reply-box').classList.remove('show');
 
-  // GASへPOST（裏で処理・タイムアウトを気にしない）
+  // GASへPOST（no-corsで確実に送信）
   fetch(GAS_ENDPOINT, {
     method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
+    mode:    'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
     body:    JSON.stringify(body)
   })
-  .then(r => r.json())
-  .then(data => {
-    if (data.error) {
-      // エラーの場合のみ画面に表示
-      document.getElementById('ai-reply-box').classList.add('show');
-      document.getElementById('ai-reply-content').innerHTML =
-        '⚠️ エラーが発生しました：' + data.error +
-        '<br><br>お手数ですが Olive.42195@gmail.com へ直接ご連絡ください。';
-    }
+  .then(() => {
+    // no-corsのため応答内容は読めないが送信は成功
+    // メールはGAS側で処理される
   })
   .catch(() => {
-    // fetch自体のエラー（タイムアウト等）は無視
-    // GASは裏で動いているためメールは届く
+    // エラーが出ても送信されている場合がある
+    // 5分待ってメールを確認するよう案内
+    document.getElementById('ai-reply-content').innerHTML =
+      '⚠️ 送信は完了した可能性があります。<br>' +
+      '5分後にメールをご確認ください。<br><br>' +
+      '届いていない場合は<br>' +
+      'Olive.42195@gmail.com へご連絡ください。';
+    document.getElementById('ai-reply-box').classList.add('show');
   });
 }
 
