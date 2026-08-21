@@ -2,734 +2,748 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name="theme-color" content="#0F6E56">
 <title>Olive Training Log</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root {
-  --primary:#0F6E56;--primary-light:#1a9973;--primary-dark:#0a4d3c;
-  --bg:#fff;--bg2:#f4f6f5;--bg3:#e8edeb;--text:#1a1a1a;--text2:#555;--text3:#888;
-  --border:#d8e2de;--card:#fff;--shadow:0 2px 12px rgba(15,110,86,.08);--nav-h:64px;
+:root{
+  --g:#0F6E56;--gd:#0a4d3c;--gl:#1a9973;
+  --bg:#fff;--bg2:#f4f6f5;--bg3:#e8edeb;
+  --tx:#1a1a1a;--tx2:#555;--tx3:#888;
+  --bd:#d8e2de;--card:#fff;
+  --sh:0 2px 10px rgba(15,110,86,.09);
+  --nh:60px;
 }
-[data-dark]{--bg:#0e1412;--bg2:#1a2420;--bg3:#243330;--text:#f0f5f3;--text2:#aabdb7;--text3:#6a8a82;--border:#2d4040;--card:#1a2420;--shadow:0 2px 12px rgba(0,0,0,.3);}
+[data-dk]{--bg:#0e1412;--bg2:#1a2420;--bg3:#243330;--tx:#f0f5f3;--tx2:#aabdb7;--tx3:#6a8a82;--bd:#2d4040;--card:#1a2420;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);padding-bottom:calc(var(--nav-h) + 16px);}
-.top-bar{background:var(--primary);color:#fff;padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.top-bar h1{font-size:17px;font-weight:700;}
-.top-bar span{font-size:11px;opacity:.75;display:block;}
-.dark-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer;}
-.bot-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--card);border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,.06);}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:none;color:var(--text3);font-size:9px;font-family:inherit;cursor:pointer;padding:4px 0;transition:color .2s;}
-.nav-btn.active{color:var(--primary);}
-.nav-btn .ico{font-size:20px;}
-.page{display:none;padding:12px 12px 0;}
-.page.active{display:block;}
-.card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden;border:1px solid var(--border);}
-.card-head{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
-.card-head h3{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}
-.card-body{display:none;padding:0 16px 16px;border-top:1px solid var(--border);}
-.card-body.open{display:block;}
-.day-tag{font-size:10px;background:var(--bg3);color:var(--text2);padding:2px 8px;border-radius:20px;font-weight:500;}
-.chevron{font-size:12px;color:var(--text3);transition:transform .2s;}
-.chevron.open{transform:rotate(180deg);}
-.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;}
-.badge-green{background:#e8f5e9;color:#2e7d32;}
-.badge-blue{background:#e3f2fd;color:#1565c0;}
-.rpe-bar{height:6px;border-radius:3px;background:var(--bg3);margin:4px 0 8px;overflow:hidden;}
-.rpe-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#43a047,#f9a825,#e53935);}
-.detail-label{font-size:11px;color:var(--text3);margin-bottom:2px;}
-.detail-val{font-size:13px;font-weight:600;}
-.detail-note{font-size:12px;color:var(--text2);background:var(--bg2);padding:8px 10px;border-radius:8px;line-height:1.6;margin-top:8px;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
-.form-group{margin-bottom:14px;}
-.form-group label{display:block;font-size:12px;color:var(--text2);margin-bottom:5px;font-weight:500;}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;font-size:14px;}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--primary);}
-.form-group textarea{min-height:72px;resize:vertical;}
-.rpe-slider-wrap{display:flex;align-items:center;gap:10px;}
-input[type=range]{flex:1;accent-color:var(--primary);}
-.rpe-val{font-size:18px;font-weight:700;color:var(--primary);min-width:24px;text-align:center;}
-.btn-primary{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:.5px;margin-top:4px;}
-.btn-primary:active{background:var(--primary-dark);}
-.btn-secondary{width:100%;padding:12px;background:var(--bg3);color:var(--text);border:none;border-radius:12px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:8px;}
-.section-title{font-size:14px;font-weight:700;color:var(--text);margin:16px 0 8px;display:flex;align-items:center;gap:6px;}
-.tab-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;}
-.tab-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;}
-.tab-btn.active{background:var(--primary);border-color:var(--primary);color:#fff;}
-/* 月別履歴 */
-.chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;}
-.log-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;}
-.log-dot{width:10px;height:10px;border-radius:50%;background:var(--primary);margin-top:5px;flex-shrink:0;}
-.log-info{flex:1;}
-.log-info .log-title{font-size:13px;font-weight:700;}
-.log-info .log-meta{font-size:11px;color:var(--text3);margin-top:2px;}
-.empty-state{text-align:center;padding:40px 20px;color:var(--text3);}
-.empty-state .ico{font-size:48px;display:block;margin-bottom:10px;}
-/* 筋トレ */
-.ex-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;}
-.ex-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:6px;}
-.ex-badges{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;}
-.ex-set{font-size:13px;font-weight:600;color:var(--primary);margin-bottom:4px;}
-.ex-note{font-size:12px;color:var(--text2);line-height:1.6;}
-/* 坂道 */
-.pattern-btn{border:2px solid var(--border);border-radius:12px;padding:12px;background:var(--bg2);cursor:pointer;margin-bottom:8px;text-align:left;width:100%;font-family:inherit;color:var(--text);transition:all .2s;}
-.pattern-btn.selected{border-color:var(--primary);background:rgba(15,110,86,.06);}
-.pattern-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;}
-.p-stat{background:var(--bg3);border-radius:8px;padding:6px;text-align:center;}
-.p-stat .p-val{font-size:13px;font-weight:700;color:var(--primary);}
-.p-stat .p-lbl{font-size:10px;color:var(--text3);}
-/* シューズ */
-.shoe-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
-.shoe-km-bar{height:4px;background:var(--bg3);border-radius:2px;margin-top:4px;overflow:hidden;}
-.shoe-km-fill{height:100%;border-radius:2px;}
-/* サマリー */
-.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
-.sum-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;}
-.sum-box .s-val{font-size:26px;font-weight:700;color:var(--primary);}
-.sum-box .s-unit{font-size:11px;color:var(--text3);}
-.sum-box .s-lbl{font-size:12px;color:var(--text2);margin-top:4px;}
-/* ── AI相談タブ ── */
-.ai-step{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;}
-.ai-step-title{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
-.chip-group{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
-.chip{padding:8px 14px;border-radius:24px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);font-family:inherit;font-size:13px;cursor:pointer;transition:all .2s;user-select:none;}
-.chip.selected{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700;}
-.multi-chip{padding:8px 14px;border-radius:24px;border:1.5px solid var(--border);background:var(--bg2);color:var(--text2);font-family:inherit;font-size:13px;cursor:pointer;transition:all .2s;}
-.multi-chip.selected{background:var(--primary-dark);border-color:var(--primary-dark);color:#fff;font-weight:700;}
-/* 画像アップロード */
-.img-upload-area{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;}
-.img-slot{aspect-ratio:1;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--bg2);position:relative;}
-.img-slot img{width:100%;height:100%;object-fit:cover;}
-.img-slot .plus{font-size:24px;color:var(--text3);}
-.img-slot .del-btn{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-/* AI回答表示 */
-.ai-reply-box{background:var(--card);border:1px solid var(--primary);border-radius:14px;padding:16px;margin-top:12px;display:none;}
-.ai-reply-box.show{display:block;}
-.ai-reply-content{font-size:13px;line-height:1.9;white-space:pre-wrap;color:var(--text);}
-.ai-reply-content strong,.ai-reply-content b{color:var(--primary);font-weight:700;}
-.waiting-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;margin-top:12px;display:none;}
-.waiting-box.show{display:block;}
-.waiting-icon{font-size:32px;display:block;margin-bottom:8px;animation:spin 2s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.waiting-text{font-size:13px;color:var(--text2);line-height:1.7;}
-.refresh-btn{margin-top:12px;padding:10px 20px;background:var(--primary);color:#fff;border:none;border-radius:24px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
-/* 強調表示（*テキスト* → 太字グリーン） */
-.highlight{color:var(--primary);font-weight:700;}
-.toast{position:fixed;bottom:calc(var(--nav-h)+12px);left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:600;z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap;}
-.toast.show{opacity:1;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--tx);padding-bottom:calc(var(--nh)+8px);}
+/* TOP BAR */
+.topbar{background:var(--g);color:#fff;padding:12px 14px 8px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99;}
+.topbar h1{font-size:16px;font-weight:700;letter-spacing:.3px;}
+.topbar p{font-size:10px;opacity:.75;margin-top:2px;}
+.dkbtn{background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:15px;cursor:pointer;flex-shrink:0;}
+/* BOTTOM NAV */
+.botnav{position:fixed;bottom:0;left:0;right:0;height:var(--nh);background:var(--card);border-top:1px solid var(--bd);display:flex;z-index:99;}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:none;color:var(--tx3);font-size:9px;font-family:inherit;cursor:pointer;padding:4px 0;}
+.nb.on{color:var(--g);}
+.nb .ic{font-size:19px;}
+/* PAGES */
+.pg{display:none;padding:10px 10px 0;}
+.pg.on{display:block;}
+/* CARDS */
+.card{background:var(--card);border-radius:12px;box-shadow:var(--sh);margin-bottom:9px;overflow:hidden;border:1px solid var(--bd);}
+.ch{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.ch h3{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;flex:1;min-width:0;}
+.ch h3 span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cb{display:none;padding:0 14px 14px;border-top:1px solid var(--bd);}
+.cb.on{display:block;}
+.tag{font-size:10px;background:var(--bg3);color:var(--tx2);padding:2px 7px;border-radius:20px;font-weight:500;white-space:nowrap;}
+.tag.q{background:#e3f2fd;color:#1565c0;}
+.tag.r{background:#e8f5e9;color:#2e7d32;}
+.tag.rest{background:#fff3e0;color:#e65100;}
+.tag.gym{background:#ede7f6;color:#4527a0;}
+.chv{font-size:11px;color:var(--tx3);transition:transform .2s;flex-shrink:0;margin-left:6px;}
+.chv.on{transform:rotate(180deg);}
+/* BADGES */
+.bdg{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;}
+.bg{background:#e8f5e9;color:#2e7d32;}
+.bb{background:#e3f2fd;color:#1565c0;}
+.bp{background:#f3e5f5;color:#6a1b9a;}
+/* FORMS */
+.fg{margin-bottom:12px;}
+.fg label{display:block;font-size:11px;color:var(--tx2);margin-bottom:4px;font-weight:500;}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 11px;border:1.5px solid var(--bd);border-radius:9px;background:var(--bg2);color:var(--tx);font-family:inherit;font-size:13px;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--g);}
+.fg textarea{min-height:64px;resize:vertical;}
+.rpew{display:flex;align-items:center;gap:8px;}
+input[type=range]{flex:1;accent-color:var(--g);}
+.rpev{font-size:17px;font-weight:700;color:var(--g);min-width:22px;text-align:center;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+/* BUTTONS */
+.btnp{width:100%;padding:13px;background:var(--g);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:4px;}
+.btnp:active{background:var(--gd);}
+.btns{width:100%;padding:11px;background:var(--bg3);color:var(--tx);border:none;border-radius:11px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:6px;}
+.btnp:disabled{opacity:.5;cursor:not-allowed;}
+/* SECTION TITLE */
+.st{font-size:13px;font-weight:700;color:var(--tx);margin:14px 0 7px;display:flex;align-items:center;gap:5px;}
+/* TABS */
+.tabs{display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tb{padding:5px 12px;border-radius:20px;border:1.5px solid var(--bd);background:var(--bg2);color:var(--tx2);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.tb.on{background:var(--g);border-color:var(--g);color:#fff;}
+/* RPE BAR */
+.rpebar{height:5px;border-radius:3px;background:var(--bg3);margin:3px 0 7px;overflow:hidden;}
+.rpefill{height:100%;border-radius:3px;background:linear-gradient(90deg,#43a047,#f9a825,#e53935);}
+/* CHART */
+.cw{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:9px;}
+/* LOG ITEMS */
+.li{padding:7px 0;border-bottom:1px solid var(--bd);display:flex;gap:9px;}
+.li:last-child{border-bottom:none;}
+.ldot{width:8px;height:8px;border-radius:50%;background:var(--g);margin-top:5px;flex-shrink:0;}
+.ltitle{font-size:12px;font-weight:700;}
+.lmeta{font-size:10px;color:var(--tx3);margin-top:1px;line-height:1.5;}
+/* EXERCISE CARDS */
+.exc{background:var(--card);border:1px solid var(--bd);border-radius:11px;padding:12px;margin-bottom:7px;}
+.extit{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.exset{font-size:12px;font-weight:600;color:var(--g);margin-bottom:3px;}
+.exnote{font-size:11px;color:var(--tx2);line-height:1.6;}
+.exstep{font-size:11px;color:var(--tx2);line-height:1.8;margin-top:5px;padding-left:8px;border-left:3px solid var(--g);}
+/* SLOPE */
+.slbtn{border:2px solid var(--bd);border-radius:11px;padding:11px;background:var(--bg2);cursor:pointer;margin-bottom:7px;text-align:left;width:100%;font-family:inherit;color:var(--tx);}
+.slbtn.on{border-color:var(--g);background:rgba(15,110,86,.05);}
+.slgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:7px;}
+.slstat{background:var(--bg3);border-radius:7px;padding:5px;text-align:center;}
+.slv{font-size:12px;font-weight:700;color:var(--g);}
+.slk{font-size:9px;color:var(--tx3);}
+/* SHOE */
+.shcard{background:var(--card);border:1px solid var(--bd);border-radius:11px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:11px;}
+.shkbar{height:4px;background:var(--bg3);border-radius:2px;margin-top:3px;overflow:hidden;}
+.shkfill{height:100%;border-radius:2px;}
+/* SUMMARY */
+.sumgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px;}
+.sumbox{background:var(--card);border:1px solid var(--bd);border-radius:11px;padding:12px 10px;text-align:center;}
+.sumv{font-size:23px;font-weight:700;color:var(--g);}
+.sumu{font-size:10px;color:var(--tx3);}
+.suml{font-size:11px;color:var(--tx2);margin-top:3px;}
+/* GOAL */
+.goalbox{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:10px 12px;background:var(--bg2);border-radius:9px;margin-bottom:7px;}
+.goaltext{font-size:12px;font-weight:600;line-height:1.6;white-space:pre-line;flex:1;}
+.goaledit{font-size:11px;color:var(--g);font-weight:600;background:none;border:1px solid var(--g);border-radius:7px;padding:3px 9px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.goalinput{display:none;margin-bottom:7px;}
+.goalinput.on{display:block;}
+/* JUMP LINK */
+.jlink{display:inline-block;font-size:10px;color:var(--g);font-weight:600;text-decoration:underline;cursor:pointer;margin-top:3px;margin-right:8px;}
+/* AI STEP */
+.aistep{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:9px;}
+.aitit{font-size:12px;font-weight:700;color:var(--g);margin-bottom:10px;}
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:3px;}
+.chip{padding:7px 12px;border-radius:22px;border:1.5px solid var(--bd);background:var(--bg2);color:var(--tx2);font-family:inherit;font-size:12px;cursor:pointer;user-select:none;}
+.chip.on{background:var(--g);border-color:var(--g);color:#fff;font-weight:700;}
+.mchip{padding:7px 12px;border-radius:22px;border:1.5px solid var(--bd);background:var(--bg2);color:var(--tx2);font-family:inherit;font-size:12px;cursor:pointer;}
+.mchip.on{background:var(--gd);border-color:var(--gd);color:#fff;font-weight:700;}
+/* IMAGE UPLOAD */
+.imgrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:7px;}
+.imgslot{aspect-ratio:1;border:2px dashed var(--bd);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--bg2);position:relative;font-size:20px;color:var(--tx3);}
+.imgslot img{width:100%;height:100%;object-fit:cover;}
+.delbtn{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;}
+/* WAITING / REPLY */
+.waitbox{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:18px;text-align:center;margin-top:10px;display:none;}
+.waitbox.on{display:block;}
+.replybox{background:var(--card);border:2px solid var(--g);border-radius:12px;padding:14px;margin-top:10px;display:none;}
+.replybox.on{display:block;}
+.replytx{font-size:12px;line-height:1.9;white-space:pre-wrap;}
+.hl{color:var(--g);font-weight:700;}
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nh)+10px);left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:9px 18px;border-radius:22px;font-size:12px;font-weight:600;z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;}
+.toast.on{opacity:1;}
+/* EMPTY STATE */
+.empty{text-align:center;padding:36px 16px;color:var(--tx3);font-size:13px;}
 </style>
 </head>
 <body>
-<div class="top-bar">
-  <div><h1>🌿 Olive Training Log</h1><span>科学的根拠と感覚の両方で走る</span></div>
-  <button class="dark-btn" onclick="toggleDark()">🌙</button>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <h1>🌿 Olive Training Log</h1>
+    <p>科学的根拠と感覚の両方で走る</p>
+  </div>
+  <button class="dkbtn" onclick="toggleDk()" aria-label="ダークモード切替">🌙</button>
 </div>
 
-<!-- 今週 -->
-<div class="page active" id="page-plan">
-  <div class="section-title">📅 今週のトレーニングプラン</div>
-  <div id="week-plan"></div>
+<!-- PAGE: 今週 -->
+<div class="pg on" id="pg-plan">
+  <div class="st">📅 今週のトレーニングプラン</div>
+  <div id="weekplan"></div>
 </div>
 
-<!-- 記録 -->
-<div class="page" id="page-record">
-  <div style="padding-top:4px">
-    <h2 style="font-size:16px;font-weight:700;margin-bottom:12px;color:var(--primary)">📝 セッションを記録する</h2>
-    <div class="form-group"><label>日付</label><input type="date" id="f-date"></div>
-    <div class="form-group"><label>セッション種別</label>
-      <select id="f-type">
-        <option value="">選択してください</option>
+<!-- PAGE: 記録 -->
+<div class="pg" id="pg-record">
+  <div class="st" style="margin-top:4px">📝 セッションを記録する</div>
+  <div class="fg"><label>日付</label><input type="date" id="rd"></div>
+  <div class="fg"><label>セッション種別</label>
+    <select id="rtype">
+      <option value="">選択してください</option>
+      <optgroup label="── ランニング ──">
         <option>🟢 回復ジョグ</option><option>🔵 LT閾値走</option>
         <option>🔴 坂道ダッシュ</option><option>🟠 傾斜走</option>
-        <option>💜 マラソンペース走</option><option>🏃 ロング走</option>
+        <option>💜 MP走</option><option>🏃 ロング走</option>
         <option>🟡 回復走</option><option>⬜ 完全休養</option>
-        <option>💪 筋トレA</option><option>💪 筋トレB</option><option>💪 筋トレC</option>
-      </select>
-    </div>
-    <div class="grid2">
-      <div class="form-group"><label>時間（分）</label><input type="number" id="f-duration" placeholder="60"></div>
-      <div class="form-group"><label>距離（km）</label><input type="number" id="f-distance" placeholder="10.0" step="0.1"></div>
-    </div>
-    <div class="grid2">
-      <div class="form-group"><label>平均心拍</label><input type="number" id="f-hr-avg" placeholder="145"></div>
-      <div class="form-group"><label>最大心拍</label><input type="number" id="f-hr-max" placeholder="165"></div>
-    </div>
-    <div class="form-group">
-      <label>RPE: <span id="rpe-label">5</span></label>
-      <div class="rpe-slider-wrap">
-        <span style="font-size:12px;color:var(--text3)">楽</span>
-        <input type="range" id="f-rpe" min="1" max="10" value="5" oninput="document.getElementById('rpe-label').textContent=this.value">
-        <span style="font-size:12px;color:var(--text3)">最大</span>
-        <span class="rpe-val" id="rpe-display">5</span>
-      </div>
-    </div>
-    <div class="form-group"><label>シューズ</label>
-      <select id="f-shoe">
-        <option>🟡 カーボン系</option><option>🔵 安定系</option><option>🟢 クッション系</option>
-      </select>
-    </div>
-    <div class="form-group"><label>メモ</label><textarea id="f-memo" placeholder="気づき・体調など..."></textarea></div>
-    <button class="btn-primary" onclick="saveLog()">✅ 記録を保存する</button>
+        <option>🌊 ファルトレク</option><option>🔥 トレッドミルアップ</option>
+        <option>🏋️ ダンベルジョグ</option>
+      </optgroup>
+      <optgroup label="── 自重・補強 ──">
+        <option>💪 筋トレA（体幹・臀部）</option>
+        <option>💪 筋トレB（肩甲骨・腹斜筋）</option>
+        <option>💪 筋トレC（臀部・鼠径部）</option>
+      </optgroup>
+      <optgroup label="── ジムMenu ──">
+        <option>🏋️ ジムMenu-A（爆発系＋体幹）</option>
+        <option>🏋️ ジムMenu-B（持続系＋内転筋）</option>
+        <option>🏋️ ジムMenu-C（回旋系＋上肢）</option>
+        <option>🏋️ ジムMenu-D（調整・探知）</option>
+      </optgroup>
+    </select>
   </div>
+  <div class="g2">
+    <div class="fg"><label>時間（分）</label><input type="number" id="rdur" placeholder="60" min="0"></div>
+    <div class="fg"><label>距離（km）</label><input type="number" id="rdist" placeholder="10.0" step="0.1" min="0"></div>
+  </div>
+  <div class="g2">
+    <div class="fg"><label>平均心拍</label><input type="number" id="rhra" placeholder="145" min="0"></div>
+    <div class="fg"><label>最大心拍</label><input type="number" id="rhrm" placeholder="165" min="0"></div>
+  </div>
+  <div class="fg">
+    <label>RPE（自覚強度）: <span id="rpelbl">5</span></label>
+    <div class="rpew">
+      <span style="font-size:11px;color:var(--tx3)">楽</span>
+      <input type="range" id="rpe" min="1" max="10" value="5" oninput="document.getElementById('rpelbl').textContent=this.value;document.getElementById('rpedisp').textContent=this.value">
+      <span style="font-size:11px;color:var(--tx3)">最大</span>
+      <span class="rpev" id="rpedisp">5</span>
+    </div>
+  </div>
+  <div class="fg"><label>シューズ種類</label>
+    <select id="rshoe">
+      <option>🟢 ジョグ用（クッション重視）</option>
+      <option>🔵 ペース・テンポ用（安定性重視）</option>
+      <option>🟡 スピード練習用（薄底・軽量反発）</option>
+      <option>🔴 レース用（カーボンプレート）</option>
+      <option>👟 ジム・室内用</option>
+    </select>
+  </div>
+  <div class="fg">
+    <label>メモ（気づき・体調など）</label>
+    <textarea id="rmemo" placeholder="気づき・体調など...&#10;例：身体の違和感（張り・軽さ・膝の違和感）&#10;　　走行中の安定度（呼吸・ペースの維持）"></textarea>
+  </div>
+  <button class="btnp" onclick="saveLog()">✅ 記録を保存する</button>
 </div>
 
-<!-- 履歴 -->
-<div class="page" id="page-history">
-  <div class="section-title">📈 月間走行距離</div>
-  <div class="chart-wrap" style="position:relative;height:200px"><canvas id="monthlyChart"></canvas></div>
-  <div class="section-title">📋 月別ワークアウト記録</div>
-  <div id="log-list"></div>
+<!-- PAGE: 履歴 -->
+<div class="pg" id="pg-history">
+  <div class="st">📈 月間走行距離</div>
+  <div class="cw" style="position:relative;height:190px"><canvas id="mchart"></canvas></div>
+  <div class="st">📋 月別ワークアウト記録</div>
+  <div id="loglist"></div>
 </div>
 
-<!-- ライブラリ -->
-<div class="page" id="page-strength">
-  <div class="tab-row">
-    <button class="tab-btn active" onclick="setStrTab('A',this)">筋トレA</button>
-    <button class="tab-btn" onclick="setStrTab('B',this)">筋トレB</button>
-    <button class="tab-btn" onclick="setStrTab('C',this)">筋トレC</button>
-    <button class="tab-btn" onclick="setStrTab('slope',this)">🏔 坂道</button>
-    <button class="tab-btn" onclick="setStrTab('shoes',this)">👟 シューズ</button>
-    <button class="tab-btn" onclick="setStrTab('summary',this)">📊 週次</button>
+<!-- PAGE: ライブラリ -->
+<div class="pg" id="pg-lib">
+  <div class="tabs" id="libtabs">
+    <button class="tb on"  onclick="setLib('A',this)">筋トレA</button>
+    <button class="tb"     onclick="setLib('B',this)">筋トレB</button>
+    <button class="tb"     onclick="setLib('C',this)">筋トレC</button>
+    <button class="tb"     onclick="setLib('gA',this)">💪ジムA</button>
+    <button class="tb"     onclick="setLib('gB',this)">💪ジムB</button>
+    <button class="tb"     onclick="setLib('gC',this)">💪ジムC</button>
+    <button class="tb"     onclick="setLib('gD',this)">💪ジムD</button>
+    <button class="tb"     onclick="setLib('slope',this)">🏔坂道</button>
+    <button class="tb"     onclick="setLib('shoes',this)">👟シューズ</button>
+    <button class="tb"     onclick="setLib('sum',this)">📊週次</button>
   </div>
-  <div id="str-content"></div>
+  <div id="libcont"></div>
 </div>
 
-<!-- AI相談 -->
-<div class="page" id="page-ai">
-  <div class="section-title">🤖 AIコーチに相談する</div>
-  <p style="font-size:12px;color:var(--text3);margin-bottom:12px">選択肢をタップして最後に送信してください。回答まで3〜5分かかります。</p>
+<!-- PAGE: AI相談 -->
+<div class="pg" id="pg-ai">
+  <div class="st">🤖 AIコーチに相談する</div>
+  <p style="font-size:11px;color:var(--tx3);margin-bottom:10px">各項目をタップして選択。最後にメールアドレスを入力して送信してください。</p>
 
-  <!-- STEP1 コンディション -->
-  <div class="ai-step">
-    <div class="ai-step-title">😊 STEP 1｜今日のコンディション</div>
-    <div class="form-group"><label>今日の気分</label>
-      <div class="chip-group" id="chips-mood">
-        <button class="chip" onclick="selectChip(this,'mood')">とても良い</button>
-        <button class="chip" onclick="selectChip(this,'mood')">良い</button>
-        <button class="chip" onclick="selectChip(this,'mood')">ふつう</button>
-        <button class="chip" onclick="selectChip(this,'mood')">少し重い</button>
-        <button class="chip" onclick="selectChip(this,'mood')">かなり重い</button>
+  <div class="aistep">
+    <div class="aitit">😊 STEP 1｜今日のコンディション</div>
+    <div class="fg"><label>今日の気分</label>
+      <div class="chips" id="c-mood">
+        <button class="chip" onclick="sc(this,'mood')">とても良い</button>
+        <button class="chip" onclick="sc(this,'mood')">良い</button>
+        <button class="chip" onclick="sc(this,'mood')">ふつう</button>
+        <button class="chip" onclick="sc(this,'mood')">少し重い</button>
+        <button class="chip" onclick="sc(this,'mood')">かなり重い</button>
       </div>
     </div>
-    <div class="form-group"><label>⚠️ 昨夜の睡眠時間（早起きランナー注意）</label>
-      <div class="chip-group" id="chips-sleep">
-        <button class="chip" onclick="selectChip(this,'sleep')">8時間以上</button>
-        <button class="chip" onclick="selectChip(this,'sleep')">7〜8時間</button>
-        <button class="chip" onclick="selectChip(this,'sleep')">6〜7時間</button>
-        <button class="chip" onclick="selectChip(this,'sleep')">5〜6時間</button>
-        <button class="chip" onclick="selectChip(this,'sleep')">5時間未満</button>
+    <div class="fg"><label>⚠️ 昨夜の睡眠時間（早起き注意）</label>
+      <div class="chips" id="c-sleep">
+        <button class="chip" onclick="sc(this,'sleep')">8時間以上</button>
+        <button class="chip" onclick="sc(this,'sleep')">7〜8時間</button>
+        <button class="chip" onclick="sc(this,'sleep')">6〜7時間</button>
+        <button class="chip" onclick="sc(this,'sleep')">5〜6時間</button>
+        <button class="chip" onclick="sc(this,'sleep')">5時間未満</button>
       </div>
     </div>
-    <div class="form-group"><label>疲労感</label>
-      <div class="chip-group" id="chips-fatigue">
-        <button class="chip" onclick="selectChip(this,'fatigue')">軽い</button>
-        <button class="chip" onclick="selectChip(this,'fatigue')">ふつう</button>
-        <button class="chip" onclick="selectChip(this,'fatigue')">強い</button>
-        <button class="chip" onclick="selectChip(this,'fatigue')">かなり強い</button>
+    <div class="fg"><label>疲労感</label>
+      <div class="chips" id="c-fatigue">
+        <button class="chip" onclick="sc(this,'fatigue')">軽い</button>
+        <button class="chip" onclick="sc(this,'fatigue')">ふつう</button>
+        <button class="chip" onclick="sc(this,'fatigue')">強い</button>
+        <button class="chip" onclick="sc(this,'fatigue')">かなり強い</button>
       </div>
     </div>
-    <div class="form-group"><label>気になる痛み・違和感</label>
-      <div class="chip-group" id="chips-pain">
-        <button class="chip" onclick="selectChip(this,'pain')">なし</button>
-        <button class="chip" onclick="selectChip(this,'pain')">膝（外側）</button>
-        <button class="chip" onclick="selectChip(this,'pain')">膝（内側）</button>
-        <button class="chip" onclick="selectChip(this,'pain')">足首</button>
-        <button class="chip" onclick="selectChip(this,'pain')">腰</button>
-        <button class="chip" onclick="selectChip(this,'pain')">股関節・鼠径部</button>
-        <button class="chip" onclick="selectChip(this,'pain')">肩・首</button>
-        <button class="chip" onclick="selectChip(this,'pain')">ふくらはぎ・アキレス</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- STEP2 取り組み -->
-  <div class="ai-step">
-    <div class="ai-step-title">🏃 STEP 2｜今日の取り組み（複数選択可）</div>
-    <div class="chip-group" id="chips-activities" style="margin-bottom:12px">
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">回復ジョグ（60分以内）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">イージーラン（60〜90分）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">ロング走（90分以上）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">LT閾値走・テンポ走</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">マラソンペース走（MP走）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">インターバル走</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">ファルトレク（変化走）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">レースペース走（15分）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">レース後半ペース走（45分）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">坂道ダッシュ</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">傾斜走（トレッドミル）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">トレイルラン</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">筋トレA（体幹・臀部）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">筋トレB（肩甲骨・腹斜筋）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">筋トレC（臀部・鼠径部）</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">モビリティ・ドリル</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">ストレッチ・フォームローラー</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">完全休養</button>
-      <button class="multi-chip" onclick="toggleChip(this,'activities')">何もできなかった</button>
-    </div>
-    <div class="grid2">
-      <div class="form-group"><label>走行距離（km）</label><input type="number" id="ai-distance" placeholder="例：10.5" step="0.1" min="0"></div>
-      <div class="form-group"><label>運動時間（分）</label><input type="number" id="ai-duration" placeholder="例：60" min="0"></div>
-    </div>
-  </div>
-
-  <!-- STEP2.5 目標タイム・シューズ -->
-  <div class="ai-step">
-    <div class="ai-step-title">🎯 STEP 2.5｜目標と使用シューズ（任意）</div>
-    <div class="form-group">
-      <label>目標タイム・目標（自由に入力してください）</label>
-      <input type="text" id="ai-goal" placeholder="例：サブ4 / 完走 / 2時間28分 / まだ決まっていない"
-        style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;font-size:14px;">
-      <p style="font-size:11px;color:var(--text3);margin-top:4px">どんな表現でも構いません。AIが内容を読み取ります。</p>
-    </div>
-    <div class="form-group" style="margin-bottom:0">
-      <label>今日使用したシューズの種類</label>
-      <div class="chip-group" id="chips-shoe">
-        <button class="chip" onclick="selectChip(this,'shoe')">🟢 ジョグ用（クッション重視）</button>
-        <button class="chip" onclick="selectChip(this,'shoe')">🔵 ペース・テンポ走用（安定性重視）</button>
-        <button class="chip" onclick="selectChip(this,'shoe')">🟡 スピード練習用（薄底・軽量反発）</button>
-        <button class="chip" onclick="selectChip(this,'shoe')">🔴 レース用（カーボンプレート）</button>
-        <button class="chip" onclick="selectChip(this,'shoe')">未使用・未選択</button>
+    <div class="fg" style="margin-bottom:0"><label>気になる痛み・違和感</label>
+      <div class="chips" id="c-pain">
+        <button class="chip" onclick="sc(this,'pain')">なし</button>
+        <button class="chip" onclick="sc(this,'pain')">膝（外側）</button>
+        <button class="chip" onclick="sc(this,'pain')">膝（内側）</button>
+        <button class="chip" onclick="sc(this,'pain')">足首</button>
+        <button class="chip" onclick="sc(this,'pain')">腰</button>
+        <button class="chip" onclick="sc(this,'pain')">股関節・鼠径部</button>
+        <button class="chip" onclick="sc(this,'pain')">肩・首</button>
+        <button class="chip" onclick="sc(this,'pain')">ふくらはぎ・アキレス</button>
       </div>
     </div>
   </div>
 
-  <!-- STEP3 練習スタイル -->
-  <div class="ai-step">
-    <div class="ai-step-title">⚖️ STEP 3｜今の練習スタイル</div>
-    <div class="form-group"><label>現在の練習スタイルに近いのは？</label>
-      <div class="chip-group" id="chips-trainingStyle">
-        <button class="chip" onclick="selectChip(this,'trainingStyle')">A：走ることが中心（補強は少なめ）</button>
-        <button class="chip" onclick="selectChip(this,'trainingStyle')">B：走る＋補強・ケアをバランスよく</button>
+  <div class="aistep">
+    <div class="aitit">🏃 STEP 2｜今日の取り組み（複数選択可）</div>
+    <div class="chips" id="c-act" style="margin-bottom:10px">
+      <button class="mchip" onclick="mc(this,'act')">回復ジョグ</button>
+      <button class="mchip" onclick="mc(this,'act')">イージーラン</button>
+      <button class="mchip" onclick="mc(this,'act')">ロング走</button>
+      <button class="mchip" onclick="mc(this,'act')">LT閾値走</button>
+      <button class="mchip" onclick="mc(this,'act')">MP走</button>
+      <button class="mchip" onclick="mc(this,'act')">インターバル走</button>
+      <button class="mchip" onclick="mc(this,'act')">ファルトレク</button>
+      <button class="mchip" onclick="mc(this,'act')">坂道ダッシュ</button>
+      <button class="mchip" onclick="mc(this,'act')">傾斜走</button>
+      <button class="mchip" onclick="mc(this,'act')">トレイルラン</button>
+      <button class="mchip" onclick="mc(this,'act')">筋トレA</button>
+      <button class="mchip" onclick="mc(this,'act')">筋トレB</button>
+      <button class="mchip" onclick="mc(this,'act')">筋トレC</button>
+      <button class="mchip" onclick="mc(this,'act')">ジムMenu-A</button>
+      <button class="mchip" onclick="mc(this,'act')">ジムMenu-B</button>
+      <button class="mchip" onclick="mc(this,'act')">ジムMenu-C</button>
+      <button class="mchip" onclick="mc(this,'act')">ジムMenu-D</button>
+      <button class="mchip" onclick="mc(this,'act')">モビリティ・ドリル</button>
+      <button class="mchip" onclick="mc(this,'act')">完全休養</button>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>走行距離（km）</label><input type="number" id="aidist" placeholder="例：10.5" step="0.1" min="0"></div>
+      <div class="fg"><label>運動時間（分）</label><input type="number" id="aidur" placeholder="例：60" min="0"></div>
+    </div>
+  </div>
+
+  <div class="aistep">
+    <div class="aitit">🎯 STEP 2.5｜目標とシューズ（任意）</div>
+    <div class="fg">
+      <label>目標・大会（自由入力）</label>
+      <input type="text" id="aigoal" placeholder="例：2027年3月 / フルマラソン / 2時間28分　／　健康維持 / 体重5kg減">
+      <div style="font-size:10px;color:var(--tx3);margin-top:3px">競技・種目・目標値など自由に入力。AIが読み取ります。</div>
+    </div>
+    <div class="fg" style="margin-bottom:0"><label>今日使用したシューズ</label>
+      <div class="chips" id="c-shoe">
+        <button class="chip" onclick="sc(this,'shoe')">🟢 ジョグ用</button>
+        <button class="chip" onclick="sc(this,'shoe')">🔵 ペース・テンポ用</button>
+        <button class="chip" onclick="sc(this,'shoe')">🟡 スピード練習用</button>
+        <button class="chip" onclick="sc(this,'shoe')">🔴 レース用（カーボン）</button>
+        <button class="chip" onclick="sc(this,'shoe')">👟 ジム・室内用</button>
       </div>
     </div>
-    <div class="form-group"><label>今週の練習バランス</label>
-      <div class="chip-group" id="chips-weekBalance">
-        <button class="chip" onclick="selectChip(this,'weekBalance')">ランニングのみ（補強ゼロ）</button>
-        <button class="chip" onclick="selectChip(this,'weekBalance')">ランニング8割・補強2割</button>
-        <button class="chip" onclick="selectChip(this,'weekBalance')">ランニング6割・補強4割</button>
-        <button class="chip" onclick="selectChip(this,'weekBalance')">ほぼ均等</button>
+  </div>
+
+  <div class="aistep">
+    <div class="aitit">⚖️ STEP 3｜練習スタイル</div>
+    <div class="fg"><label>現在の練習スタイル</label>
+      <div class="chips" id="c-style">
+        <button class="chip" onclick="sc(this,'style')">A：走ることが中心</button>
+        <button class="chip" onclick="sc(this,'style')">B：走る＋ジム・補強をバランスよく</button>
       </div>
     </div>
-    <div class="form-group"><label>直近1ヶ月の補強・ケア頻度</label>
-      <div class="chip-group" id="chips-strengthFreq">
-        <button class="chip" onclick="selectChip(this,'strengthFreq')">ほぼ毎日</button>
-        <button class="chip" onclick="selectChip(this,'strengthFreq')">週3〜4回</button>
-        <button class="chip" onclick="selectChip(this,'strengthFreq')">週1〜2回</button>
-        <button class="chip" onclick="selectChip(this,'strengthFreq')">ほとんどやっていない</button>
-        <button class="chip" onclick="selectChip(this,'strengthFreq')">全くやっていない</button>
+    <div class="fg"><label>今週の練習バランス</label>
+      <div class="chips" id="c-wbal">
+        <button class="chip" onclick="sc(this,'wbal')">ランニングのみ</button>
+        <button class="chip" onclick="sc(this,'wbal')">ランニング8割・補強2割</button>
+        <button class="chip" onclick="sc(this,'wbal')">ランニング6割・補強4割</button>
+        <button class="chip" onclick="sc(this,'wbal')">ほぼ均等</button>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:0"><label>直近1ヶ月の補強・ジム頻度</label>
+      <div class="chips" id="c-freq">
+        <button class="chip" onclick="sc(this,'freq')">ほぼ毎日</button>
+        <button class="chip" onclick="sc(this,'freq')">週3〜4回</button>
+        <button class="chip" onclick="sc(this,'freq')">週1〜2回</button>
+        <button class="chip" onclick="sc(this,'freq')">ほとんどやっていない</button>
       </div>
     </div>
   </div>
 
-  <!-- STEP4 相談内容 -->
-  <div class="ai-step">
-    <div class="ai-step-title">💬 STEP 4｜相談したいこと（複数選択可）</div>
-    <div class="chip-group" id="chips-topics">
-      <button class="multi-chip" onclick="toggleChip(this,'topics')">明日以降のメニューを提案してほしい</button>
-      <button class="multi-chip" onclick="toggleChip(this,'topics')">今日のフォーム・動きについて</button>
-      <button class="multi-chip" onclick="toggleChip(this,'topics')">疲労・回復の考え方</button>
-      <button class="multi-chip" onclick="toggleChip(this,'topics')">食事・栄養について</button>
-      <button class="multi-chip" onclick="toggleChip(this,'topics')">目標レースへのプランニング</button>
-      <button class="multi-chip" onclick="toggleChip(this,'topics')">痛み・違和感への対処</button>
-      <button class="multi-chip" onclick="toggleChip(this,'topics')">補強・ストレッチのやり方</button>
-      <button class="multi-chip" onclick="toggleChip(this,'topics')">モチベーション・メンタル面</button>
+  <div class="aistep">
+    <div class="aitit">💬 STEP 4｜相談したいこと（複数選択可）</div>
+    <div class="chips" id="c-topic">
+      <button class="mchip" onclick="mc(this,'topic')">明日のメニューを提案してほしい</button>
+      <button class="mchip" onclick="mc(this,'topic')">フォーム・動きについて</button>
+      <button class="mchip" onclick="mc(this,'topic')">疲労・回復の考え方</button>
+      <button class="mchip" onclick="mc(this,'topic')">食事・栄養について</button>
+      <button class="mchip" onclick="mc(this,'topic')">目標レースへのプランニング</button>
+      <button class="mchip" onclick="mc(this,'topic')">痛み・違和感への対処</button>
+      <button class="mchip" onclick="mc(this,'topic')">補強・ジムメニューのやり方</button>
+      <button class="mchip" onclick="mc(this,'topic')">モチベーション・メンタル面</button>
     </div>
   </div>
 
-  <!-- STEP5 回答の量 -->
-  <div class="ai-step">
-    <div class="ai-step-title">📏 STEP 5｜回答の量を選ぶ</div>
-    <div class="chip-group" id="chips-replyLength">
-      <button class="chip" onclick="selectChip(this,'replyLength')">🟢 ポイントだけ教えて（約400字）</button>
-      <button class="chip" onclick="selectChip(this,'replyLength')">🔵 次の練習も含めて教えて（約700字）</button>
-      <button class="chip" onclick="selectChip(this,'replyLength')">🟣 じっくり詳しく教えて（約1000字以上）</button>
+  <div class="aistep">
+    <div class="aitit">📏 STEP 5｜回答の量</div>
+    <div class="chips" id="c-len">
+      <button class="chip" onclick="sc(this,'len')">🟢 ポイントだけ（約400字）</button>
+      <button class="chip" onclick="sc(this,'len')">🔵 次の練習も含めて（約700字）</button>
+      <button class="chip" onclick="sc(this,'len')">🟣 じっくり詳しく（約1000字以上）</button>
     </div>
   </div>
 
-  <!-- STEP6 ウォッチ画像 -->
-  <div class="ai-step">
-    <div class="ai-step-title">📷 STEP 6｜ウォッチ画面を追加（任意・最大4枚）</div>
-    <p style="font-size:12px;color:var(--text3);margin-bottom:8px">ガーミン・Apple Watch・Corosなどのスクリーンショットを追加するとデータを自動読み取りします。</p>
-    <div class="img-upload-area" id="img-upload-area">
-      <div class="img-slot" id="slot-0" onclick="triggerImgInput(0)"><span class="plus">＋</span></div>
-      <div class="img-slot" id="slot-1" onclick="triggerImgInput(1)"><span class="plus">＋</span></div>
-      <div class="img-slot" id="slot-2" onclick="triggerImgInput(2)"><span class="plus">＋</span></div>
-      <div class="img-slot" id="slot-3" onclick="triggerImgInput(3)"><span class="plus">＋</span></div>
+  <div class="aistep">
+    <div class="aitit">📷 STEP 6｜ウォッチ画面を追加（任意・最大4枚）</div>
+    <div style="font-size:10px;color:var(--tx3);margin-bottom:7px">ガーミン・Apple Watch等のスクリーンショットを追加するとデータを自動読み取りします。</div>
+    <div class="imgrow" id="imgrow">
+      <div class="imgslot" id="sl0" onclick="trigImg(0)">＋</div>
+      <div class="imgslot" id="sl1" onclick="trigImg(1)">＋</div>
+      <div class="imgslot" id="sl2" onclick="trigImg(2)">＋</div>
+      <div class="imgslot" id="sl3" onclick="trigImg(3)">＋</div>
     </div>
-    <input type="file" id="img-input" accept="image/*" style="display:none" onchange="handleImgSelect(event)">
-    <div id="img-read-status" style="font-size:12px;color:var(--primary);margin-top:6px;display:none">📊 画像を読み取り中...</div>
+    <input type="file" id="imgfile" accept="image/*" style="display:none" onchange="handleImg(event)">
   </div>
 
-  <!-- STEP7 メモ -->
-  <div class="ai-step">
-    <div class="ai-step-title">📝 STEP 7｜一言メモ（任意・100字程度）</div>
-    <textarea id="ai-memo" placeholder="例：アップダウンの多いコースだったが姿勢が保てた" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;font-size:13px;min-height:60px;"></textarea>
+  <div class="aistep">
+    <div class="aitit">📝 STEP 7｜一言メモ（任意）</div>
+    <textarea id="aimemo" style="width:100%;padding:9px;border:1.5px solid var(--bd);border-radius:9px;background:var(--bg2);color:var(--tx);font-family:inherit;font-size:12px;min-height:60px;" placeholder="気づき・体調など...&#10;例：身体の違和感（張り・軽さ・膝の違和感）&#10;　　走行中の安定度（呼吸・ペースの維持）"></textarea>
   </div>
 
-  <!-- STEP8 メールアドレス -->
-  <div class="ai-step" style="border:2px solid var(--primary)">
-    <div class="ai-step-title">📧 STEP 8｜回答を受け取るメールアドレス</div>
-    <p style="font-size:12px;color:var(--text3);margin-bottom:10px">AIコーチからの回答をこのアドレスへ送信します。</p>
-    <div class="form-group" style="margin-bottom:0">
-      <input type="email" id="ai-email" placeholder="例：your@email.com"
-        style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;font-size:14px;">
-    </div>
-    <p style="font-size:11px;color:var(--text3);margin-top:6px">※回答まで3〜5分かかります。メールをご確認ください。</p>
+  <div class="aistep" style="border:2px solid var(--g)">
+    <div class="aitit">📧 STEP 8｜回答を受け取るメールアドレス（必須）</div>
+    <div style="font-size:10px;color:var(--tx3);margin-bottom:8px">AIコーチからの回答をこのアドレスへ送信します。</div>
+    <input type="email" id="aiemail" placeholder="your@email.com" style="width:100%;padding:11px;border:1.5px solid var(--bd);border-radius:9px;background:var(--bg2);color:var(--tx);font-family:inherit;font-size:13px;">
+    <div style="font-size:10px;color:var(--tx3);margin-top:5px">※回答まで3〜5分かかります。</div>
   </div>
 
-  <!-- 送信ボタン -->
-  <button class="btn-primary" onclick="submitAIConsult()" id="ai-submit-btn">📧 AIコーチに相談する（メールで回答）</button>
+  <button class="btnp" onclick="sendAI()" id="aibtn">📧 AIコーチに相談する（メールで回答）</button>
 
-  <!-- 送信完了表示 -->
-  <div class="waiting-box" id="waiting-box">
-    <span style="font-size:32px;display:block;margin-bottom:8px">📨</span>
-    <div class="waiting-text">
-      <strong>送信が完了しました！</strong><br>
+  <div class="waitbox" id="waitbox">
+    <div style="font-size:28px;margin-bottom:7px">📨</div>
+    <div style="font-size:12px;color:var(--tx2);line-height:1.7">
+      <strong>送信完了！</strong><br>
       AIコーチが回答を作成中です。<br>
-      <strong style="color:var(--primary)" id="sent-email-display"></strong><br>
-      へ3〜5分以内にメールが届きます。<br>
-      <small style="color:var(--text3)">※混雑時は5分以上かかる場合があります</small>
+      <strong style="color:var(--g)" id="emaildisp"></strong><br>
+      へ3〜5分以内にメールが届きます。
     </div>
-    <button class="btn-secondary" onclick="resetAIForm()" style="margin-top:16px">↩ もう一度相談する</button>
+    <button class="btns" onclick="resetAI()" style="margin-top:12px">↩ もう一度相談する</button>
   </div>
 
-  <!-- AI回答表示（エラー時のみ） -->
-  <div class="ai-reply-box" id="ai-reply-box">
-    <div style="font-size:12px;color:var(--primary);font-weight:700;margin-bottom:8px">🌿 AIコーチからの回答</div>
-    <div class="ai-reply-content" id="ai-reply-content"></div>
-    <button class="btn-secondary" onclick="resetAIForm()" style="margin-top:16px">↩ もう一度相談する</button>
+  <div class="replybox" id="replybox">
+    <div style="font-size:11px;color:var(--g);font-weight:700;margin-bottom:7px">🌿 AIコーチからの回答</div>
+    <div class="replytx" id="replytx"></div>
+    <button class="btns" onclick="resetAI()" style="margin-top:12px">↩ もう一度相談する</button>
   </div>
 </div>
 
-<nav class="bot-nav">
-  <button class="nav-btn active" onclick="navTo('plan',this)"><span class="ico">📅</span>今週</button>
-  <button class="nav-btn" onclick="navTo('record',this)"><span class="ico">✏️</span>記録</button>
-  <button class="nav-btn" onclick="navTo('history',this)"><span class="ico">📈</span>履歴</button>
-  <button class="nav-btn" onclick="navTo('strength',this)"><span class="ico">💪</span>ライブラリ</button>
-  <button class="nav-btn" onclick="navTo('ai',this)"><span class="ico">🤖</span>AI相談</button>
+<!-- BOTTOM NAV -->
+<nav class="botnav">
+  <button class="nb on" onclick="nav('plan',this)"><span class="ic">📅</span>今週</button>
+  <button class="nb"    onclick="nav('record',this)"><span class="ic">✏️</span>記録</button>
+  <button class="nb"    onclick="nav('history',this)"><span class="ic">📈</span>履歴</button>
+  <button class="nb"    onclick="nav('lib',this)"><span class="ic">💪</span>ライブラリ</button>
+  <button class="nb"    onclick="nav('ai',this)"><span class="ic">🤖</span>AI相談</button>
 </nav>
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// ★ GAS Web App URL をここに貼り付けてください ★
-// ============================================================
-const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzLVZlTscrmVjsrDjsk3qXg5gH-zOFabtjusWe67bAXKKR7Er_G5U9R_SKJCDH2ko7kjA/exec';
+// ── GAS ENDPOINT（デプロイ後ここを書き換え）──
+const EP = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbzLVZlTscrmVjsrDjsk3qXg5gH-zOFabtjusWe67bAXKKR7Er_G5U9R_SKJCDH2ko7kjA/exec';
 
-// ============================================================
-// 選択状態管理
-// ============================================================
-const selections = { mood:'', sleep:'', fatigue:'', pain:'', activities:[], trainingStyle:'', weekBalance:'', strengthFreq:'', topics:[], replyLength:'', shoe:'' };
-const imgData = [null, null, null, null];
-let currentImgSlot = 0;
-let pendingReply = null;
-
-function selectChip(btn, key) {
-  document.querySelectorAll('#chips-' + key + ' .chip').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  selections[key] = btn.textContent.trim();
-}
-
-function toggleChip(btn, key) {
-  btn.classList.toggle('selected');
-  const val = btn.textContent.trim();
-  if (btn.classList.contains('selected')) {
-    if (!selections[key].includes(val)) selections[key].push(val);
-  } else {
-    selections[key] = selections[key].filter(v => v !== val);
-  }
-}
-
-// ============================================================
-// 画像アップロード
-// ============================================================
-function triggerImgInput(slot) {
-  currentImgSlot = slot;
-  document.getElementById('img-input').click();
-}
-
-function handleImgSelect(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(ev) {
-    const dataUrl = ev.target.result;
-    const base64 = dataUrl.split(',')[1];
-    const mimeType = file.type;
-    imgData[currentImgSlot] = { data: base64, mimeType: mimeType };
-    const slot = document.getElementById('slot-' + currentImgSlot);
-    slot.innerHTML = '<img src="' + dataUrl + '"><button class="del-btn" onclick="removeImg(' + currentImgSlot + ',event)">✕</button>';
-    document.getElementById('img-input').value = '';
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeImg(slot, e) {
-  e.stopPropagation();
-  imgData[slot] = null;
-  document.getElementById('slot-' + slot).innerHTML = '<span class="plus">＋</span>';
-  document.getElementById('slot-' + slot).onclick = function() { triggerImgInput(slot); };
-}
-
-// ============================================================
-// AI相談送信
-// ============================================================
-function submitAIConsult() {
-  // バリデーション
-  if (!selections.mood)  { showToast('⚠️ 今日の気分を選択してください'); return; }
-  if (!selections.sleep) { showToast('⚠️ 睡眠時間を選択してください'); return; }
-  const email = document.getElementById('ai-email').value.trim();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showToast('⚠️ メールアドレスを正しく入力してください'); return;
-  }
-
-  const images = imgData.filter(d => d !== null);
-  const body = {
-    action:        'consult',
-    clientEmail:   email,
-    mood:          selections.mood,
-    sleep:         selections.sleep,
-    fatigue:       selections.fatigue,
-    pain:          selections.pain,
-    activities:    selections.activities,
-    distance:      document.getElementById('ai-distance').value,
-    duration:      document.getElementById('ai-duration').value,
-    trainingStyle: selections.trainingStyle,
-    weekBalance:   selections.weekBalance,
-    strengthFreq:  selections.strengthFreq,
-    topics:        selections.topics,
-    replyLength:   selections.replyLength,
-    goalTime:      document.getElementById('ai-goal').value.trim(),
-    shoeType:      selections.shoe,
-    memo:          document.getElementById('ai-memo').value,
-    images:        images
-  };
-
-  const btn = document.getElementById('ai-submit-btn');
-  btn.disabled = true;
-  btn.textContent = '📨 送信中...';
-
-  // 送信完了画面をすぐ表示（メール送信は裏で処理）
-  document.getElementById('sent-email-display').textContent = email;
-  document.getElementById('waiting-box').classList.add('show');
-  document.getElementById('ai-reply-box').classList.remove('show');
-
-  // GASへPOST（no-corsで確実に送信）
-  fetch(GAS_ENDPOINT, {
-    method:  'POST',
-    mode:    'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body:    JSON.stringify(body)
-  })
-  .then(() => {
-    // no-corsのため応答内容は読めないが送信は成功
-    // メールはGAS側で処理される
-  })
-  .catch(() => {
-    // エラーが出ても送信されている場合がある
-    // 5分待ってメールを確認するよう案内
-    document.getElementById('ai-reply-content').innerHTML =
-      '⚠️ 送信は完了した可能性があります。<br>' +
-      '5分後にメールをご確認ください。<br><br>' +
-      '届いていない場合は<br>' +
-      'Olive.42195@gmail.com へご連絡ください。';
-    document.getElementById('ai-reply-box').classList.add('show');
-  });
-}
-
-function checkReply() {
-  if (!pendingReply) {
-    showToast('まだ作成中です。しばらくお待ちください。');
-    return;
-  }
-  document.getElementById('waiting-box').classList.remove('show');
-  document.getElementById('ai-reply-box').classList.add('show');
-  document.getElementById('ai-reply-content').innerHTML = formatReply(pendingReply);
-  document.getElementById('ai-submit-btn').disabled = false;
-  document.getElementById('ai-submit-btn').textContent = '🤖 AIコーチに相談する';
-  window.scrollTo({ top: document.getElementById('ai-reply-box').offsetTop - 20, behavior: 'smooth' });
-}
-
-// *強調テキスト* をHTMLに変換
-function formatReply(text) {
-  return text
-    .replace(/\*(.*?)\*/g, '<span class="highlight">$1</span>')
-    .replace(/\n/g, '<br>');
-}
-
-function resetAIForm() {
-  Object.keys(selections).forEach(k => { selections[k] = Array.isArray(selections[k]) ? [] : ''; });
-  document.querySelectorAll('.chip.selected,.multi-chip.selected').forEach(b => b.classList.remove('selected'));
-  document.getElementById('ai-distance').value = '';
-  document.getElementById('ai-duration').value = '';
-  document.getElementById('ai-goal').value = '';
-  document.getElementById('ai-memo').value = '';
-  imgData.fill(null);
-  [0,1,2,3].forEach(i => { document.getElementById('slot-'+i).innerHTML = '<span class="plus">＋</span>'; });
-  document.getElementById('ai-reply-box').classList.remove('show');
-  document.getElementById('waiting-box').classList.remove('show');
-  pendingReply = null;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// ============================================================
-// ナビ
-// ============================================================
-let currentPage='plan', rpeChart=null, currentStrTab='A';
-
-function navTo(page, btn) {
-  currentPage = page;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const pid = page === 'strength' ? 'page-strength' : page === 'ai' ? 'page-ai' : 'page-' + page;
-  document.getElementById(pid).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (page === 'history') renderHistory();
-  if (page === 'strength') renderStrTab(currentStrTab);
-}
-
-function toggleDark() {
-  document.body.toggleAttribute('data-dark');
-  if (rpeChart) { rpeChart.destroy(); rpeChart = null; }
-  if (currentPage === 'history') setTimeout(renderHistory, 50);
-}
-
-// ============================================================
-// 週間プラン
-// ============================================================
-const WEEK_PLAN = [
-  {day:'月',label:'回復ジョグ + 筋トレA',emoji:'🟢',type:'recovery',tags:['回復','筋トレA'],rpe:4,details:'回復ジョグ 40〜50分、心拍ゾーン1〜2（最大心拍の65〜75%）。筋トレAをジョグ後に実施。',shoes:'クッション系',note:'会話できるペースを厳守。前日の疲労感が強い場合は20分に短縮可。'},
-  {day:'火',label:'LT閾値走（トレッドミル）',emoji:'🔵',type:'quality',tags:['質練習','LT走','室内'],rpe:8,details:'W-up 15分 → 閾値ペース×20〜25分×1〜2本 → C-down 10分。心拍ゾーン4。',shoes:'安定系',note:'トレッドミルは1.0〜1.5%傾斜設定で屋外の空気抵抗を再現。'},
-  {day:'水',label:'坂道ダッシュ / 傾斜走 + 筋トレB',emoji:'🔴',type:'quality',tags:['質練習','坂道','筋トレB'],rpe:8,details:'疲労感に応じて3パターンから選択。筋トレBをセッション後に実施。',shoes:'安定系',note:'坂道は接地時間を短く、前傾姿勢を意識。'},
-  {day:'木',label:'MP走 + 補助筋トレ',emoji:'💜',type:'quality',tags:['質練習','MP走'],rpe:7,details:'W-up 10分 → マラソンペース（sub2:28目標：3:32/km）×12〜16km → C-down 10分。',shoes:'安定系',note:'レースペースの感覚を体に刻む日。'},
-  {day:'金',label:'完全休養 or 軽ジョグ',emoji:'⬜',type:'rest',tags:['休養'],rpe:1,details:'基本は完全休養。疲労が残っていなければ20〜30分の非常に軽いジョグも可。',shoes:'クッション系',note:'ストレッチ・ローリング・入浴を優先。'},
-  {day:'土',label:'ロング走（ビルドアップ週）',emoji:'🏃',type:'quality',tags:['ロング走','最重要'],rpe:7,details:'通常週：楽なペースで25〜30km。後半ビルドアップ週：前半MPより30秒遅い→後半MPペース切り替え。',shoes:'クッション系',note:'エネルギー補給を25km前後で1回実施。'},
-  {day:'日',label:'回復走 + 筋トレC',emoji:'🟡',type:'recovery',tags:['回復','筋トレC'],rpe:3,details:'50〜60分の非常に楽なジョグ（心拍ゾーン1〜2）。筋トレCをジョグ後に実施。',shoes:'クッション系',note:'土曜ロング走の疲労を流す。'},
+// ── 週間プランデータ ──
+const WP = [
+  {d:'月',lb:'回復ジョグ＋筋トレA',em:'🟢',tp:'回復',tags:['回復','筋トレA'],rpe:4,shoes:'🟢 ジョグ用',
+   note:'会話できるペースを厳守。疲労が強い場合は20分に短縮可。',
+   det:'回復ジョグ 40〜50分、心拍ゾーン1〜2。筋トレAをジョグ後に実施。',
+   gl:'A',jl:null},
+  {d:'火',lb:'LT閾値走（トレッドミル）',em:'🔵',tp:'質練習',tags:['質練習','LT走'],rpe:8,shoes:'🔵 ペース・テンポ用',
+   note:'トレッドミルは1.0〜1.5%傾斜設定で屋外の空気抵抗を再現。',
+   det:'W-up 15分 → 閾値ペース×20〜25分×1〜2本 → C-down 10分。心拍ゾーン4。',
+   gl:null,jl:null},
+  {d:'水',lb:'坂道ダッシュ＋筋トレB / ジムA',em:'🔴',tp:'質練習',tags:['質練習','坂道','筋トレB'],rpe:8,shoes:'🔵 ペース・テンポ用',
+   note:'坂道は接地時間を短く、前傾姿勢を意識。ジム利用日はMenu-Aへ切り替え可。',
+   det:'疲労感に応じて坂道3パターンから選択。ジム利用日はジムMenu-Aに切り替え可。',
+   gl:'B',jl:'gA'},
+  {d:'木',lb:'MP走＋補助筋トレ / ジムB',em:'💜',tp:'質練習',tags:['質練習','MP走'],rpe:7,shoes:'🔵 ペース・テンポ用',
+   note:'レースペースの感覚を体に刻む日。ジム利用日はMenu-Bへ切り替え可。',
+   det:'W-up 10分 → マラソンペース×12〜16km → C-down 10分。',
+   gl:null,jl:'gB'},
+  {d:'金',lb:'完全休養 or 軽ジョグ',em:'⬜',tp:'休養',tags:['休養'],rpe:1,shoes:'🟢 ジョグ用',
+   note:'ストレッチ・ローリング・入浴を優先。',
+   det:'基本は完全休養。疲労が残っていなければ20〜30分の非常に軽いジョグも可。',
+   gl:null,jl:null},
+  {d:'土',lb:'ロング走（ビルドアップ週）',em:'🏃',tp:'質練習',tags:['ロング走','最重要'],rpe:7,shoes:'🟢 ジョグ用 / 🔴 レース用',
+   note:'エネルギー補給を25km前後で1回実施。',
+   det:'通常週：楽なペースで25〜30km。後半ビルドアップ週：前半MPより30秒遅い→後半MPペース。',
+   gl:null,jl:null},
+  {d:'日',lb:'回復走＋筋トレC / ジムC',em:'🟡',tp:'回復',tags:['回復','筋トレC'],rpe:3,shoes:'🟢 ジョグ用',
+   note:'土曜ロング走の疲労を流す。無理なく。ジム利用日はMenu-Cへ切り替え可。',
+   det:'50〜60分の非常に楽なジョグ（心拍ゾーン1〜2）。筋トレCをジョグ後に実施。',
+   gl:'C',jl:'gC'},
 ];
 
-function renderWeekPlan() {
-  document.getElementById('week-plan').innerHTML = WEEK_PLAN.map((d,i) => `
+// ── ライブラリデータ ──
+const LIB = {
+  A:[
+    {nm:'プランク',em:'🧘',ms:['体幹','腹直筋'],st:'3セット×45〜60秒',nt:'腰が下がらないよう体幹をニュートラルに保持。肩甲骨を引き離すイメージ。'},
+    {nm:'グルートブリッジ',em:'🍑',ms:['臀部','ハムストリング'],st:'3セット×15回',nt:'股関節伸展でなく臀部の収縮を意識。トップで2秒ホールド。'},
+    {nm:'クラムシェル（バンド）',em:'🐚',ms:['中臀筋','外旋筋'],st:'左右各3セット×15回',nt:'膝だけを開く。骨盤が回旋しないよう固定。'},
+    {nm:'デッドバグ',em:'🐛',ms:['深層体幹','腸腰筋'],st:'左右各3セット×10回',nt:'腰が床から浮かないように。対角線の手足をゆっくり伸ばす。'},
+    {nm:'サイドプランク',em:'💎',ms:['腹斜筋','体幹'],st:'左右各3セット×30秒',nt:'骨盤が落ちないよう上臀部に力を入れ続ける。'},
+  ],
+  B:[
+    {nm:'チューブ肩甲帯引き戻し',em:'🎯',ms:['菱形筋','僧帽筋中下部'],st:'3セット×15回',nt:'肩甲骨を脊柱に引き寄せる。肩がすくまないよう下げたまま動作。'},
+    {nm:'Yレイズ（床上）',em:'✈️',ms:['肩甲骨周囲','棘上筋'],st:'3セット×12回',nt:'親指を上に向けたまま45度持ち上げる。反動禁止。'},
+    {nm:'ロシアンツイスト',em:'🔄',ms:['腹斜筋','体幹回旋'],st:'3セット×20回',nt:'骨盤は固定し胸郭から回旋する。'},
+    {nm:'カーフレイズ（シングル）',em:'🦵',ms:['腓腹筋','ヒラメ筋'],st:'左右各3セット×20回',nt:'ゆっくり降ろす（エキセントリック重視）。段差使用推奨。'},
+    {nm:'チューブ股関節外転',em:'🦀',ms:['中臀筋','小臀筋'],st:'左右各3セット×15回',nt:'体幹が傾かないよう注意。'},
+  ],
+  C:[
+    {nm:'ヒップスラスト',em:'🏋️',ms:['大臀筋','ハムストリング'],st:'3セット×12回',nt:'トップで臀部を最大収縮させる。'},
+    {nm:'腸腰筋ストレッチ＋補強',em:'🌊',ms:['腸腰筋','鼠径部'],st:'左右各3セット×12回',nt:'ランジ姿勢からゆっくり体重を前にかける。'},
+    {nm:'スーパーマン',em:'🦸',ms:['脊柱起立筋','臀部'],st:'3セット×15回',nt:'対角線バリエーション推奨（腰痛がある場合）。'},
+    {nm:'ノルディックカール',em:'⚡',ms:['ハムストリング'],st:'3セット×6〜8回',nt:'ランナーの故障予防に最重要。週1で十分。'},
+    {nm:'腸脛靭帯フォームロール',em:'🧻',ms:['腸脛靭帯','外側大腿'],st:'左右各1〜2分',nt:'痛い箇所で静止して緩める。走行後必須。'},
+  ],
+  gA:[
+    {nm:'トレッドミルアップ',em:'🔥',ms:['全身','心肺'],st:'傾斜3〜8% / 時速9〜11km / 15〜40分',nt:'体調に応じて時間調整。ダンベル・ペットボトルを保持する日もある。'},
+    {nm:'ケトルベルスイング',em:'🔔',ms:['大殿筋','ハムストリング','全身連動'],st:'16〜24kg / 20〜30回×3〜4セット',
+     nt:'股関節の爆発的伸展・臀筋のキレを意識。膝の屈曲を抑え股関節ヒンジで振り出す。',
+     sp:'①膝を微曲・股関節を後ろへ引く\n②爆発的に股関節を伸展してスイング\n③トップで臀筋を収縮・体幹を固定'},
+    {nm:'トーソローテーション（高負荷）',em:'🔄',ms:['腹横筋','腹斜筋','下肢複合'],st:'70〜80kg / 左右各20〜30回×3セット',
+     nt:'腹横筋・腹斜筋・下肢の複合運動。骨盤回旋剛性と腹腔内圧を同時に高める。',
+     sp:'①骨盤を固定・軸を安定\n②胸郭から回旋（腕で引かない）\n③戻す際も体幹を緩めない'},
+    {nm:'オーバーヘッドウォーキングランジ',em:'🏋️',ms:['大殿筋','ハム','内転筋','体幹剛性'],st:'プレート5〜10kg / 左右各8〜10歩×3セット',
+     nt:'頭上加重で抗伸展・抗屈曲力を強制。内転筋と大殿筋の連動性向上。',
+     sp:'①プレートを両手で頭上へ押し上げ肘ロック\n②そのまま深めにランジ（前進）\n③上体の左右ブレをゼロに保つ'},
+    {nm:'レッグプレス（標準）',em:'🦵',ms:['大殿筋','腸腰筋','下肢全体'],st:'6〜8回で限界の重量×3セット',
+     nt:'挙上は爆発的・戻しは2秒コントロール。踵中心で押し出す。',
+     sp:'①足をやや上め（大殿筋に効く位置）に設定\n②息を吸って腹圧をかける\n③爆発的に押し出し・ゆっくり戻す'},
+    {nm:'ドローイン＆ツイストクランチ',em:'💪',ms:['腹筋下部','腸腰筋','対角線体幹'],st:'ダンベル5〜10kg / 左右交互20〜30回×3セット',
+     nt:'腹圧をかけたまま肩甲骨を浮かせ肘と膝を交互にタッチ。腰は床から浮かさない。',
+     sp:'①仰向け・膝を立てる・お腹に重りを載せる\n②息を吐きながら肩甲骨を浮かせる\n③右肘と左膝・左肘と右膝を交互にタッチ'},
+  ],
+  gB:[
+    {nm:'トレッドミルアップ',em:'🔥',ms:['全身','心肺'],st:'傾斜3〜8% / 15〜40分',nt:'体調に応じて時間調整。'},
+    {nm:'ヒップアダクション',em:'🦵',ms:['内転筋','骨盤底筋群'],st:'67.5kg / 50〜100回×4〜5セット',
+     nt:'骨盤底筋を引き上げる意識で内転筋を強力に収縮。着地時のニーインと骨盤落ちを防ぐ。',
+     sp:'①骨盤をニュートラルに保つ\n②内ももで引き寄せる（膝を閉じる）\n③ゆっくり戻す（エキセントリック意識）'},
+    {nm:'トーソローテーション（中負荷・高回数）',em:'🔄',ms:['腹斜筋','腹横筋','アンチローテーション'],st:'60〜65kg / 左右各50回×2〜3セット',
+     nt:'インナーマッスルのキレを高回数で磨く。腕でひねらず胸郭から回旋する。'},
+    {nm:'ハーフポール設置レッグプレス',em:'🦵',ms:['大殿筋'],st:'80kg / 50回×4セット',
+     nt:'背部にハーフポールを挟み腰椎屈曲をロック。大殿筋主導で押し返す。',
+     sp:'①背部にハーフポール設置（腰椎保護）\n②深屈曲位までゆっくり引き込む\n③大殿筋で爆発的に押し返す'},
+    {nm:'ランジスクワット（重り挙上）',em:'🚶',ms:['大殿筋','内転筋','中殿筋','体幹'],st:'8〜12kg / 各脚6〜8回×3セット',
+     nt:'上体の左右ブレをゼロに保つことが目標。片脚安定性と体幹の連動を養う。'},
+    {nm:'背筋台（多角度）',em:'⬆️',ms:['背筋','大殿筋','ハムストリング'],st:'自重 / 50回×各姿勢2セット',
+     nt:'骨盤テンセグリティの調整。直後に前屈ストレッチをセットで行い骨盤前後バランスを整える。'},
+  ],
+  gC:[
+    {nm:'トレッドミルアップ',em:'🔥',ms:['全身','心肺'],st:'傾斜3〜8% / 15〜40分',nt:'体調に応じて時間調整。'},
+    {nm:'ダイアゴナルスイング',em:'🪓',ms:['腹斜筋','体幹軸固定'],st:'8〜12kg / 左右各8〜10回×3セット',
+     nt:'斜め下から対角線上の斜め上へスイング。腕の力ではなく体幹の回旋力で振る。骨盤は固定・胸郭だけを回旋。',
+     sp:'①重りを体の斜め外側下に構える\n②骨盤を固定したまま胸郭で回旋\n③対角線の斜め上へ弧を描くようにスイング'},
+    {nm:'ダンベルキックバック',em:'💪',ms:['上腕三頭筋','広背筋後部'],st:'左右各8〜10回×3セット',
+     nt:'肘の位置を高く固定し後ろへ押し切る。重さより収縮感と肩甲骨安定を重視。'},
+    {nm:'ルーマニアンデッドリフト（RDL）',em:'🏋️',ms:['ハムストリング','大殿筋上部'],st:'片手14〜18kg / 6〜8回×3セット',
+     nt:'膝は微曲位（約15〜20度）を保ち動作中に角度を変えない。',
+     sp:'①膝を15〜20度曲げた状態で固定\n②股関節を真後ろへ引く（お尻を壁に押し出すイメージ）\n③背中はフラット（丸まった瞬間に即停止）\n④重りは脚に沿って垂直に下ろす\n⑤ハムが張る感覚が出たところで止める'},
+    {nm:'傾斜台マルチポジショナル腹筋',em:'🧘',ms:['腹直筋','腹斜筋','腹横筋（IAP）'],st:'ダンベル10kg / 各姿勢50回×2セット',
+     nt:'腹臥位・側臥位（左右）・背臥位の3方向で全方位から刺激。腹腔内圧（IAP）強化。'},
+    {nm:'腹筋ローラー（膝立ち）',em:'🔁',ms:['腹圧シリンダー','体幹抗伸展'],st:'自重・3秒かけて前に転がす / 8〜10回×3セット',
+     nt:'腰が反らないよう腹圧をかけ続ける。戻す際も腹筋で引き戻す。'},
+  ],
+  gD:[
+    {nm:'トレッドミルアップ（軽め）',em:'🔥',ms:['全身','心肺'],st:'傾斜1〜3% / 15〜20分（調整期）',nt:'状態確認を最優先。無理に強度を上げない。'},
+    {nm:'レッグプレス＆RDL（軽負荷探知）',em:'🔍',ms:['股関節','膝関節'],st:'遠心性3〜4秒コントロール',
+     nt:'負荷をかけることではなく「正しい軌道で違和感・左右差を探知する」日。特定の角度での引っかかりを見つけることが最大の収穫。'},
+    {nm:'トーソローテーション（超軽負荷）',em:'🔄',ms:['体幹','アライメント調整'],st:'左右各15〜20回×2セット',
+     nt:'体幹の左右差・ねじれをニュートラルに戻す。重さよりも均等な動きを優先。'},
+    {nm:'背筋台＋前屈ストレッチ',em:'⬆️',ms:['背筋','腰椎','大殿筋'],st:'自重・軽い刺激後に即前屈',
+     nt:'骨盤の前後バランスを整える。刺激後すぐに前屈でリリースするのがポイント。'},
+    {nm:'傾斜トレッドミル変化走',em:'🌊',ms:['後方運動鎖','VO2max'],st:'傾斜3〜7% / 時速14〜14.7km / 20〜30分（調整期15〜20分）',
+     nt:'着地衝撃を排除しつつ大殿筋・ハムストリングスへ高出力。調整期は時間短縮。'},
+  ],
+};
+
+const SLOPES=[
+  {id:'hi',nm:'高強度短距離（坂ダッシュ）',desc:'神経系・最大筋力向上',gr:'8〜12%',sp:'最大努力',rp:'6〜10本',rs:'2〜3分',cl:'#e53935'},
+  {id:'md',nm:'中強度持続（坂レペ）',desc:'LT向上・走力強化',gr:'4〜6%',sp:'5K〜10Kペース',rp:'4〜6本',rs:'90秒〜2分',cl:'#f57f17'},
+  {id:'ae',nm:'有酸素傾斜（傾斜トレミ）',desc:'有酸素基盤・フォーム矯正',gr:'2〜3%',sp:'Eペース+10秒',rp:'30〜40分連続',rs:'なし',cl:'#2e7d32'},
+];
+
+const SHOES_D=[
+  {nm:'Vaporfly 3',tp:'レース用（カーボン）',km:342,max:500,cl:'#e53935'},
+  {nm:'Pegasus 41',tp:'ペース・テンポ用',km:510,max:800,cl:'#1565c0'},
+  {nm:'React Infinity 4',tp:'ジョグ用',km:210,max:700,cl:'#2e7d32'},
+];
+
+const LIB_TITLES={
+  A:'筋トレA（体幹・臀部）',B:'筋トレB（肩甲骨・腹斜筋）',C:'筋トレC（臀部・鼠径部）',
+  gA:'ジムMenu-A｜爆発系＋体幹複合',gB:'ジムMenu-B｜持続系＋内転筋複合',
+  gC:'ジムMenu-C｜回旋系＋上肢複合',gD:'ジムMenu-D｜調整・回復探知',
+};
+
+// ── 状態 ──
+let curPage='plan', chart=null, curLib='A';
+const SEL={mood:'',sleep:'',fatigue:'',pain:'',act:[],style:'',wbal:'',freq:'',topic:[],len:'',shoe:''};
+const IMGS=[null,null,null,null];
+let curSlot=0;
+
+// ── ユーティリティ ──
+function gl(id){return document.getElementById(id);}
+function LS(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;}}
+function SS(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function getLogs(){return LS('olive_logs')||[];}
+function saveLogs(a){SS('olive_logs',a);}
+function getGoal(){return LS('olive_goal')||'フルマラソン sub-2:28\n目標ペース 3:32/km　2026年3月';}
+function saveGoal(v){SS('olive_goal',v);}
+
+function toast(msg){
+  const t=gl('toast');t.textContent=msg;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2400);
+}
+
+// ── ナビ ──
+function nav(page,btn){
+  curPage=page;
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  gl('pg-'+page).classList.add('on');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(page==='history')renderHistory();
+  if(page==='lib')renderLib(curLib);
+}
+
+function toggleDk(){
+  document.body.toggleAttribute('data-dk');
+  if(chart){chart.destroy();chart=null;}
+  if(curPage==='history')setTimeout(renderHistory,50);
+}
+
+// ── 今週プラン ──
+function renderWeekPlan(){
+  gl('weekplan').innerHTML=WP.map((d,i)=>`
     <div class="card">
-      <div class="card-head" onclick="toggleCard(${i})">
-        <h3>${d.emoji} ${d.day}曜日 — ${d.label}</h3>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="day-tag ${d.type==='rest'?'rest':''}">${d.type==='quality'?'質練習':d.type==='rest'?'休養':'回復'}</span>
-          <span class="chevron" id="chev-${i}">▼</span>
+      <div class="ch" onclick="togCard(${i})">
+        <h3>${d.em} <span>${d.d}曜 — ${d.lb}</span></h3>
+        <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
+          <span class="tag ${d.tp==='質練習'?'q':d.tp==='休養'?'rest':'r'}">${d.tp}</span>
+          ${d.jl?'<span class="tag gym">ジム可</span>':''}
+          <span class="chv" id="cv${i}">▼</span>
         </div>
       </div>
-      <div class="card-body" id="body-${i}">
-        <div style="padding-top:10px">
-          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">📋 メニュー</div>
-          <div style="font-size:13px;line-height:1.7;margin-bottom:10px">${d.details}</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
-            ${d.tags.map(t=>`<span class="badge badge-${t.includes('質')?'blue':'green'}">${t}</span>`).join('')}
+      <div class="cb" id="cb${i}">
+        <div style="padding-top:9px">
+          <div style="font-size:11px;color:var(--tx2);line-height:1.7;margin-bottom:8px">${d.det}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
+            ${d.tags.map(t=>`<span class="bdg ${t.includes('質')||t.includes('ロング')?'bb':'bg'}">${t}</span>`).join('')}
           </div>
-          <div class="grid2">
-            <div><div style="font-size:11px;color:var(--text3)">目標RPE</div><div style="font-size:13px;font-weight:700">${d.rpe}/10</div><div class="rpe-bar"><div class="rpe-fill" style="width:${d.rpe*10}%"></div></div></div>
-            <div><div style="font-size:11px;color:var(--text3)">推奨シューズ</div><div style="font-size:12px;font-weight:600">${d.shoes}</div></div>
+          ${d.gl?`<a class="jlink" onclick="jumpLib('${d.gl}')">📋 筋トレ${d.gl}の詳細を見る →</a>`:''}
+          ${d.jl?`<a class="jlink" onclick="jumpLib('${d.jl}')">💪 ジムMenu詳細を見る →</a>`:''}
+          <div class="g2" style="margin-top:7px">
+            <div>
+              <div style="font-size:10px;color:var(--tx3)">目標RPE</div>
+              <div style="font-size:12px;font-weight:700">${d.rpe}/10</div>
+              <div class="rpebar"><div class="rpefill" style="width:${d.rpe*10}%"></div></div>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--tx3)">推奨シューズ</div>
+              <div style="font-size:11px;font-weight:600;margin-top:2px">${d.shoes}</div>
+            </div>
           </div>
-          <div class="detail-note">💡 ${d.note}</div>
+          <div style="font-size:11px;color:var(--tx2);background:var(--bg2);padding:7px 9px;border-radius:7px;line-height:1.6;margin-top:7px">💡 ${d.note}</div>
         </div>
       </div>
     </div>`).join('');
 }
 
-function toggleCard(i) {
-  document.getElementById('body-'+i).classList.toggle('open');
-  document.getElementById('chev-'+i).classList.toggle('open');
+function togCard(i){
+  gl('cb'+i).classList.toggle('on');
+  gl('cv'+i).classList.toggle('on');
 }
 
-// ============================================================
-// 記録
-// ============================================================
-document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
-document.getElementById('f-rpe').addEventListener('input', function(){
-  document.getElementById('rpe-label').textContent = this.value;
-  document.getElementById('rpe-display').textContent = this.value;
-});
+function jumpLib(tab){
+  const libBtn=document.querySelector('.nb:nth-child(4)');
+  nav('lib',libBtn);
+  curLib=tab;
+  document.querySelectorAll('#libtabs .tb').forEach(b=>b.classList.remove('on'));
+  const tabMap={A:'筋トレA',B:'筋トレB',C:'筋トレC',gA:'💪ジムA',gB:'💪ジムB',gC:'💪ジムC',gD:'💪ジムD'};
+  document.querySelectorAll('#libtabs .tb').forEach(b=>{
+    if(b.textContent.trim()===tabMap[tab])b.classList.add('on');
+  });
+  renderLib(tab);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
-function getLogs() { try { return JSON.parse(localStorage.getItem('olive_logs')||'[]'); } catch(e){ return []; } }
-function saveLogs(arr) { localStorage.setItem('olive_logs', JSON.stringify(arr)); }
+// ── 記録 ──
+gl('rd').value=new Date().toISOString().slice(0,10);
 
-function saveLog() {
-  const type = document.getElementById('f-type').value;
-  if (!type) { showToast('⚠️ セッション種別を選択してください'); return; }
-  const log = {
-    id:Date.now(), date:document.getElementById('f-date').value,
-    type, duration:+document.getElementById('f-duration').value||0,
-    distance:+document.getElementById('f-distance').value||0,
-    hrAvg:+document.getElementById('f-hr-avg').value||0, hrMax:+document.getElementById('f-hr-max').value||0,
-    rpe:+document.getElementById('f-rpe').value, shoe:document.getElementById('f-shoe').value,
-    memo:document.getElementById('f-memo').value
+function saveLog(){
+  const tp=gl('rtype').value;
+  if(!tp){toast('⚠️ セッション種別を選択してください');return;}
+  const log={
+    id:Date.now(),date:gl('rd').value,type:tp,
+    dur:+gl('rdur').value||0,dist:+gl('rdist').value||0,
+    hra:+gl('rhra').value||0,hrm:+gl('rhrm').value||0,
+    rpe:+gl('rpe').value,shoe:gl('rshoe').value,memo:gl('rmemo').value
   };
-  const logs = getLogs(); logs.push(log); saveLogs(logs);
-  document.getElementById('f-type').value='';
-  document.getElementById('f-duration').value='';
-  document.getElementById('f-distance').value='';
-  document.getElementById('f-hr-avg').value='';
-  document.getElementById('f-hr-max').value='';
-  document.getElementById('f-rpe').value=5;
-  document.getElementById('rpe-label').textContent='5';
-  document.getElementById('rpe-display').textContent='5';
-  document.getElementById('f-memo').value='';
-  showToast('✅ 記録を保存しました！');
+  const logs=getLogs();logs.push(log);saveLogs(logs);
+  ['rtype','rdur','rdist','rhra','rhrm','rmemo'].forEach(id=>gl(id).value='');
+  gl('rpe').value=5;gl('rpelbl').textContent='5';gl('rpedisp').textContent='5';
+  toast('✅ 記録を保存しました！');
 }
 
-// ============================================================
-// 履歴
-// ============================================================
-function renderHistory() {
-  const logs = getLogs();
-  renderMonthlyChart(logs);
-  renderMonthlyList(logs);
+// ── 履歴 ──
+function renderHistory(){
+  renderMonthChart(getLogs());
+  renderMonthList(getLogs());
 }
 
-function renderMonthlyChart(logs) {
-  const dark = document.body.hasAttribute('data-dark');
-  const gridColor = dark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)';
-  const textColor = dark?'#aabdb7':'#888';
+function renderMonthChart(logs){
+  const dk=document.body.hasAttribute('data-dk');
+  const gc=dk?'rgba(255,255,255,.07)':'rgba(0,0,0,.05)';
+  const tc=dk?'#aabdb7':'#888';
   const map={};
-  logs.forEach(l=>{ const ym=l.date.slice(0,7); map[ym]=(map[ym]||0)+l.distance; });
+  logs.forEach(l=>{const ym=l.date.slice(0,7);map[ym]=(map[ym]||0)+l.dist;});
   const months=[];
-  for(let i=5;i>=0;i--){ const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i); months.push(d.toISOString().slice(0,7)); }
-  const labels=months.map(m=>m.slice(0,4)+'年'+parseInt(m.slice(5))+'月');
+  for(let i=5;i>=0;i--){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);months.push(d.toISOString().slice(0,7));}
+  const labels=months.map(m=>parseInt(m.slice(5))+'月');
   const data=months.map(m=>+(map[m]||0).toFixed(1));
-  if(rpeChart){rpeChart.destroy();rpeChart=null;}
-  rpeChart=new Chart(document.getElementById('monthlyChart'),{
-    type:'bar',data:{labels,datasets:[{label:'走行距離(km)',data,backgroundColor:'rgba(15,110,86,0.75)',borderRadius:6,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+'km'}}},
-    scales:{x:{ticks:{color:textColor,font:{size:10}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:textColor,font:{size:10},callback:v=>v+'km'},grid:{color:gridColor}}}}
+  if(chart){chart.destroy();chart=null;}
+  chart=new Chart(gl('mchart'),{
+    type:'bar',
+    data:{labels,datasets:[{label:'走行距離(km)',data,backgroundColor:'rgba(15,110,86,0.72)',borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+'km'}}},
+      scales:{x:{ticks:{color:tc,font:{size:10}},grid:{display:false}},
+              y:{beginAtZero:true,ticks:{color:tc,font:{size:10},callback:v=>v+'km'},grid:{color:gc}}}}
   });
 }
 
-function renderMonthlyList(logs) {
-  const list=document.getElementById('log-list');
-  if(!logs.length){list.innerHTML='<div class="empty-state"><span class="ico">📭</span>まだ記録がありません</div>';return;}
-  const groups={};
-  logs.forEach(l=>{const ym=l.date.slice(0,7);if(!groups[ym])groups[ym]=[];groups[ym].push(l);});
-  const sortedMonths=Object.keys(groups).sort((a,b)=>b.localeCompare(a));
-  list.innerHTML=sortedMonths.map((ym,idx)=>{
-    const entries=groups[ym].sort((a,b)=>b.date.localeCompare(a.date));
-    const totalKm=entries.reduce((s,l)=>s+l.distance,0).toFixed(1);
-    const label=ym.slice(0,4)+'年'+parseInt(ym.slice(5))+'月';
-    const uid='month-'+ym.replace('-','');
+function renderMonthList(logs){
+  const lst=gl('loglist');
+  if(!logs.length){lst.innerHTML='<div class="empty">📭 まだ記録がありません</div>';return;}
+  const grp={};
+  logs.forEach(l=>{const ym=l.date.slice(0,7);if(!grp[ym])grp[ym]=[];grp[ym].push(l);});
+  const mons=Object.keys(grp).sort((a,b)=>b.localeCompare(a));
+  lst.innerHTML=mons.map((ym,idx)=>{
+    const entries=grp[ym].sort((a,b)=>b.date.localeCompare(a.date));
+    const tkm=entries.reduce((s,l)=>s+l.dist,0).toFixed(1);
+    const lbl=ym.slice(0,4)+'年'+parseInt(ym.slice(5))+'月';
+    const uid='m'+ym.replace('-','');
     return `<div class="card" style="margin-bottom:8px">
-      <div class="card-head" onclick="toggleMonth('${uid}')">
-        <h3>📅 ${label}</h3>
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:14px;font-weight:700;color:var(--primary)">${totalKm} km</span>
-          <span class="chevron ${idx===0?'open':''}" id="chev-${uid}">▼</span>
+      <div class="ch" onclick="togM('${uid}')">
+        <h3>📅 <span>${lbl}</span></h3>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span style="font-size:13px;font-weight:700;color:var(--g)">${tkm}km</span>
+          <span class="chv ${idx===0?'on':''}" id="cv-${uid}">▼</span>
         </div>
       </div>
-      <div class="card-body ${idx===0?'open':''}" id="${uid}">
-        ${entries.map(l=>`<div class="log-item" style="border:none;padding:8px 0;border-bottom:1px solid var(--border)">
-          <div class="log-dot"></div>
-          <div class="log-info">
-            <div class="log-title">${l.date.slice(5).replace('-','/')} ${l.type}</div>
-            <div class="log-meta">📍 ${l.distance}km ⏱ ${l.duration}分 ❤️ ${l.hrAvg||'—'} RPE ${l.rpe} 👟 ${l.shoe}</div>
-            ${l.memo?`<div class="log-meta" style="color:var(--text2)">💬 ${l.memo}</div>`:''}
+      <div class="cb ${idx===0?'on':''}" id="${uid}">
+        ${entries.map(l=>`<div class="li">
+          <div class="ldot"></div>
+          <div>
+            <div class="ltitle">${l.date.slice(5).replace('-','/')} ${l.type}</div>
+            <div class="lmeta">📍${l.dist}km ⏱${l.dur}分 ❤️${l.hra||'—'} RPE:${l.rpe} 👟${l.shoe}</div>
+            ${l.memo?`<div class="lmeta">💬${l.memo}</div>`:''}
           </div>
         </div>`).join('')}
       </div>
@@ -737,135 +751,183 @@ function renderMonthlyList(logs) {
   }).join('');
 }
 
-function toggleMonth(uid) {
-  document.getElementById(uid).classList.toggle('open');
-  document.getElementById('chev-'+uid).classList.toggle('open');
+function togM(uid){
+  gl(uid).classList.toggle('on');
+  gl('cv-'+uid).classList.toggle('on');
 }
 
-// ============================================================
-// ライブラリ
-// ============================================================
-const STRENGTH={
-  A:[
-    {name:'プランク',emoji:'🧘',muscles:['体幹','腹直筋'],sets:'3セット×45〜60秒',note:'腰が下がらないよう体幹をニュートラルに保持。'},
-    {name:'グルートブリッジ',emoji:'🍑',muscles:['臀部','ハムストリング'],sets:'3セット×15回',note:'トップで2秒ホールド。臀部の収縮を意識。'},
-    {name:'クラムシェル（バンド）',emoji:'🐚',muscles:['中臀筋','外旋筋'],sets:'左右各3セット×15回',note:'骨盤が回旋しないよう固定。'},
-    {name:'デッドバグ',emoji:'🐛',muscles:['深層体幹','腸腰筋'],sets:'左右各3セット×10回',note:'腰が床から浮かないように。'},
-    {name:'サイドプランク',emoji:'💎',muscles:['腹斜筋','体幹'],sets:'左右各3セット×30秒',note:'骨盤が落ちないよう上臀部に力を入れ続ける。'},
-  ],
-  B:[
-    {name:'チューブ肩甲帯引き戻し',emoji:'🎯',muscles:['菱形筋','僧帽筋中下部'],sets:'3セット×15回',note:'肩甲骨を脊柱に引き寄せる。肩がすくまないよう。'},
-    {name:'Yレイズ（床上）',emoji:'✈️',muscles:['肩甲骨周囲','棘上筋'],sets:'3セット×12回',note:'親指を上に向けたまま45度持ち上げる。反動禁止。'},
-    {name:'ロシアンツイスト',emoji:'🔄',muscles:['腹斜筋','体幹回旋'],sets:'3セット×20回',note:'骨盤は固定し胸郭から回旋する。'},
-    {name:'カーフレイズ（シングル）',emoji:'🦵',muscles:['腓腹筋','ヒラメ筋'],sets:'左右各3セット×20回',note:'ゆっくり降ろす（エキセントリック重視）。段差使用推奨。'},
-    {name:'チューブ股関節外転',emoji:'🦀',muscles:['中臀筋','小臀筋'],sets:'左右各3セット×15回',note:'体幹が傾かないよう注意。'},
-  ],
-  C:[
-    {name:'ヒップスラスト',emoji:'🏋️',muscles:['大臀筋','ハムストリング'],sets:'3セット×12回',note:'トップで臀部を最大収縮させる。'},
-    {name:'腸腰筋ストレッチ+補強',emoji:'🌊',muscles:['腸腰筋','鼠径部'],sets:'左右各3セット×12回',note:'ランジ姿勢からゆっくり体重を前にかける。'},
-    {name:'スーパーマン',emoji:'🦸',muscles:['脊柱起立筋','臀部'],sets:'3セット×15回',note:'対角線バリエーション推奨（腰痛がある場合）。'},
-    {name:'ノルディックカール',emoji:'⚡',muscles:['ハムストリング'],sets:'3セット×6〜8回',note:'ランナーの故障予防に最重要。週1で十分。'},
-    {name:'腸脛靭帯フォームロール',emoji:'🧻',muscles:['腸脛靭帯','外側大腿'],sets:'左右各1〜2分',note:'痛い箇所で静止して緩める。走行後必須。'},
-  ]
-};
-
-const SLOPE_PATTERNS=[
-  {id:'high',name:'高強度短距離（坂ダッシュ）',desc:'神経系・最大筋力向上',grade:'8〜12%',speed:'最大努力',reps:'6〜10本',rest:'2〜3分',color:'#e53935'},
-  {id:'mid',name:'中強度持続（坂レペ）',desc:'LT向上・走力強化',grade:'4〜6%',speed:'5K〜10Kペース',reps:'4〜6本',rest:'90秒〜2分',color:'#f57f17'},
-  {id:'aero',name:'有酸素傾斜（傾斜トレミ）',desc:'有酸素基盤・フォーム矯正',grade:'2〜3%',speed:'Eペース+10秒',reps:'30〜40分連続',rest:'なし',color:'#2e7d32'},
-];
-
-const SHOES_DEFAULT=[
-  {name:'Vaporfly 3',type:'カーボン系',km:342,maxKm:500,color:'#f57f17'},
-  {name:'Pegasus 41',type:'安定系',km:510,maxKm:800,color:'#1565c0'},
-  {name:'React Infinity 4',type:'クッション系',km:210,maxKm:700,color:'#2e7d32'},
-];
-
-function setStrTab(tab, btn) {
-  currentStrTab=tab;
-  document.querySelectorAll('#page-strength .tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderStrTab(tab);
+// ── ライブラリ ──
+function setLib(tab,btn){
+  curLib=tab;
+  document.querySelectorAll('#libtabs .tb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderLib(tab);
 }
 
-function renderStrTab(tab) {
-  const cont=document.getElementById('str-content');
-  if(tab==='A'||tab==='B'||tab==='C'){
-    cont.innerHTML=`<div class="section-title">💪 筋トレ${tab}メニュー</div>`+
-      STRENGTH[tab].map(ex=>`<div class="ex-card">
-        <div class="ex-title">${ex.emoji} ${ex.name}</div>
-        <div class="ex-badges">${ex.muscles.map(m=>`<span class="badge badge-green">${m}</span>`).join('')}</div>
-        <div class="ex-set">📋 ${ex.sets}</div>
-        <div class="ex-note">💡 ${ex.note}</div>
+function renderLib(tab){
+  const c=gl('libcont');
+  if(LIB[tab]){
+    c.innerHTML=`<div class="st">💪 ${LIB_TITLES[tab]}</div>`+
+      LIB[tab].map(e=>`<div class="exc">
+        <div class="extit">${e.em} ${e.nm}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px">
+          ${e.ms.map(m=>`<span class="bdg bg">${m}</span>`).join('')}
+        </div>
+        <div class="exset">📋 ${e.st}</div>
+        <div class="exnote">💡 ${e.nt}</div>
+        ${e.sp?`<div class="exstep">${e.sp.replace(/\n/g,'<br>')}</div>`:''}
       </div>`).join('');
   } else if(tab==='slope'){
-    cont.innerHTML=`<div class="section-title">🏔 坂道パターン</div>`+
-      SLOPE_PATTERNS.map(p=>`<button class="pattern-btn" id="pat-${p.id}" onclick="selectPattern('${p.id}')">
-        <h4 style="color:${p.color}">${p.name}</h4>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:4px">${p.desc}</div>
-        <div class="pattern-grid">
-          <div class="p-stat"><div class="p-val">${p.grade}</div><div class="p-lbl">傾斜</div></div>
-          <div class="p-stat"><div class="p-val" style="font-size:11px">${p.speed}</div><div class="p-lbl">速度</div></div>
-          <div class="p-stat"><div class="p-val">${p.reps}</div><div class="p-lbl">本数</div></div>
-          <div class="p-stat"><div class="p-val" style="font-size:11px">${p.rest}</div><div class="p-lbl">休息</div></div>
+    c.innerHTML=`<div class="st">🏔 坂道パターン</div>`+
+      SLOPES.map(p=>`<button class="slbtn" id="sl-${p.id}" onclick="selSlope('${p.id}')">
+        <div style="font-size:13px;font-weight:700;color:${p.cl};margin-bottom:3px">${p.nm}</div>
+        <div style="font-size:11px;color:var(--tx2);margin-bottom:5px">${p.desc}</div>
+        <div class="slgrid">
+          <div class="slstat"><div class="slv">${p.gr}</div><div class="slk">傾斜</div></div>
+          <div class="slstat"><div class="slv" style="font-size:10px">${p.sp}</div><div class="slk">速度</div></div>
+          <div class="slstat"><div class="slv">${p.rp}</div><div class="slk">本数</div></div>
+          <div class="slstat"><div class="slv" style="font-size:10px">${p.rs}</div><div class="slk">休息</div></div>
         </div>
       </button>`).join('');
   } else if(tab==='shoes'){
-    cont.innerHTML=`<div class="section-title">👟 シューズローテーション</div>`+
-      SHOES_DEFAULT.map(s=>{
-        const pct=Math.min(100,(s.km/s.maxKm)*100);
+    c.innerHTML=`<div class="st">👟 シューズローテーション</div>`+
+      SHOES_D.map(s=>{
+        const pct=Math.min(100,(s.km/s.max*100));
         const warn=pct>80;
-        return `<div class="shoe-card">
-          <div style="font-size:28px">👟</div>
+        return `<div class="shcard">
+          <div style="font-size:26px">👟</div>
           <div style="flex:1">
-            <div style="font-size:13px;font-weight:700">${s.name}</div>
-            <div style="font-size:11px;color:var(--text3)">${s.type}</div>
-            <div style="font-size:12px;color:var(--text2)">${s.km}km / ${s.maxKm}km ${warn?'⚠️ 交換時期近づいています':''}</div>
-            <div class="shoe-km-bar"><div class="shoe-km-fill" style="width:${pct}%;background:${warn?'#e53935':s.color}"></div></div>
+            <div style="font-size:12px;font-weight:700">${s.nm}</div>
+            <div style="font-size:10px;color:var(--tx3)">${s.tp}</div>
+            <div style="font-size:11px;color:var(--tx2)">${s.km}km / ${s.max}km ${warn?'⚠️ 交換時期':''}</div>
+            <div class="shkbar"><div class="shkfill" style="width:${pct}%;background:${warn?'#e53935':s.cl}"></div></div>
           </div>
         </div>`;
       }).join('');
-  } else if(tab==='summary'){
+  } else if(tab==='sum'){
     const logs=getLogs();
     const now=new Date();
-    const weekStart=new Date(now);
-    weekStart.setDate(now.getDate()-now.getDay()+1);
-    weekStart.setHours(0,0,0,0);
-    const wl=logs.filter(l=>new Date(l.date)>=weekStart);
-    const totalKm=wl.reduce((s,l)=>s+l.distance,0).toFixed(1);
-    const totalMin=wl.reduce((s,l)=>s+l.duration,0);
-    const quality=wl.filter(l=>['LT閾値走','坂道ダッシュ','傾斜走','MP走','ロング走'].some(t=>l.type.includes(t))).length;
-    cont.innerHTML=`<div class="section-title">📊 今週のサマリー</div>
-      <div class="sum-grid">
-        <div class="sum-box"><div class="s-val">${totalKm}</div><div class="s-unit">km</div><div class="s-lbl">総走行距離</div></div>
-        <div class="sum-box"><div class="s-val">${Math.floor(totalMin/60)}h${totalMin%60}m</div><div class="s-unit"></div><div class="s-lbl">総練習時間</div></div>
-        <div class="sum-box"><div class="s-val">${quality}</div><div class="s-unit">回</div><div class="s-lbl">質練習</div></div>
-        <div class="sum-box"><div class="s-val">${wl.length}</div><div class="s-unit">回</div><div class="s-lbl">総セッション</div></div>
+    const ws=new Date(now);ws.setDate(now.getDate()-now.getDay()+1);ws.setHours(0,0,0,0);
+    const wl=logs.filter(l=>new Date(l.date)>=ws);
+    const tkm=wl.reduce((s,l)=>s+l.dist,0).toFixed(1);
+    const tmin=wl.reduce((s,l)=>s+l.dur,0);
+    const qt=wl.filter(l=>['LT','MP走','坂道','ロング走','インターバル'].some(t=>l.type.includes(t))).length;
+    const goal=getGoal();
+    c.innerHTML=`
+      <div class="st">📊 今週のサマリー</div>
+      <div class="sumgrid">
+        <div class="sumbox"><div class="sumv">${tkm}</div><div class="sumu">km</div><div class="suml">総走行距離</div></div>
+        <div class="sumbox"><div class="sumv">${Math.floor(tmin/60)}h${tmin%60}m</div><div class="suml">総練習時間</div></div>
+        <div class="sumbox"><div class="sumv">${qt}</div><div class="sumu">回</div><div class="suml">質練習</div></div>
+        <div class="sumbox"><div class="sumv">${wl.length}</div><div class="sumu">回</div><div class="suml">セッション数</div></div>
       </div>
-      <div class="section-title">🏆 目標レース</div>
-      <div class="card" style="padding:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div><div style="font-size:13px;font-weight:700">フルマラソン sub-2:28</div><div style="font-size:11px;color:var(--text3)">目標ペース 3:32/km</div></div>
-          <span class="badge badge-green">2026年3月</span>
+      <div class="st">🏆 目標レース・大会</div>
+      <div class="card" style="padding:12px">
+        <div class="goalbox" id="goalbox">
+          <div class="goaltext">${goal}</div>
+          <button class="goaledit" onclick="togGoal()">✏️ 変更</button>
+        </div>
+        <div class="goalinput" id="goalinput">
+          <textarea id="goalval" style="width:100%;padding:9px;border:1.5px solid var(--g);border-radius:9px;background:var(--bg2);color:var(--tx);font-family:inherit;font-size:12px;min-height:72px;">${goal}</textarea>
+          <div style="font-size:10px;color:var(--tx3);margin:4px 0 6px">例：2027年3月 / フルマラソン / 2時間28分　／　健康維持 / 体重5kg減</div>
+          <div style="display:flex;gap:6px">
+            <button class="btnp" style="flex:1;padding:9px;font-size:12px" onclick="saveGoalEdit()">💾 保存</button>
+            <button class="btns" style="flex:1;padding:9px;font-size:12px;margin:0" onclick="cancelGoal()">キャンセル</button>
+          </div>
         </div>
       </div>`;
   }
 }
 
-function selectPattern(id) {
-  document.querySelectorAll('.pattern-btn').forEach(b=>b.classList.remove('selected'));
-  document.getElementById('pat-'+id).classList.add('selected');
-  showToast('✅ '+SLOPE_PATTERNS.find(x=>x.id===id).name+' を選択しました');
+function selSlope(id){
+  document.querySelectorAll('.slbtn').forEach(b=>b.classList.remove('on'));
+  gl('sl-'+id).classList.add('on');
+  toast('✅ '+SLOPES.find(x=>x.id===id).nm+' を選択しました');
 }
 
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+function togGoal(){
+  const inp=gl('goalinput');
+  inp.classList.toggle('on');
+  if(inp.classList.contains('on'))gl('goalval').value=getGoal();
+}
+function saveGoalEdit(){
+  const v=gl('goalval').value.trim();
+  if(v)saveGoal(v);
+  gl('goalinput').classList.remove('on');
+  renderLib('sum');
+}
+function cancelGoal(){gl('goalinput').classList.remove('on');}
+
+// ── AI相談 ──
+function sc(btn,key){
+  document.querySelectorAll(`#c-${key} .chip`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');SEL[key]=btn.textContent.trim();
+}
+function mc(btn,key){
+  btn.classList.toggle('on');
+  const v=btn.textContent.trim();
+  if(btn.classList.contains('on')){if(!SEL[key].includes(v))SEL[key].push(v);}
+  else SEL[key]=SEL[key].filter(x=>x!==v);
+}
+function trigImg(slot){curSlot=slot;gl('imgfile').click();}
+function handleImg(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const url=ev.target.result;
+    IMGS[curSlot]={data:url.split(',')[1],mimeType:f.type};
+    const s=gl('sl'+curSlot);
+    s.innerHTML=`<img src="${url}"><button class="delbtn" onclick="delImg(${curSlot},event)">✕</button>`;
+    gl('imgfile').value='';
+  };
+  r.readAsDataURL(f);
+}
+function delImg(slot,e){
+  e.stopPropagation();IMGS[slot]=null;
+  const s=gl('sl'+slot);s.innerHTML='＋';s.onclick=()=>trigImg(slot);
 }
 
-// 初期化
+function sendAI(){
+  if(!SEL.mood){toast('⚠️ 今日の気分を選択してください');return;}
+  if(!SEL.sleep){toast('⚠️ 睡眠時間を選択してください');return;}
+  const email=gl('aiemail').value.trim();
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast('⚠️ メールアドレスを正しく入力してください');return;}
+  const imgs=IMGS.filter(x=>x);
+  const body={action:'consult',clientEmail:email,
+    mood:SEL.mood,sleep:SEL.sleep,fatigue:SEL.fatigue,pain:SEL.pain,
+    activities:SEL.act,distance:gl('aidist').value,duration:gl('aidur').value,
+    trainingStyle:SEL.style,weekBalance:SEL.wbal,strengthFreq:SEL.freq,
+    topics:SEL.topic,replyLength:SEL.len,goalTime:gl('aigoal').value.trim(),
+    shoeType:SEL.shoe,memo:gl('aimemo').value,images:imgs
+  };
+  const btn=gl('aibtn');btn.disabled=true;btn.textContent='📨 送信中...';
+  gl('emaildisp').textContent=email;
+  gl('waitbox').classList.add('on');
+  gl('replybox').classList.remove('on');
+  fetch(EP,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+  .then(r=>r.json()).then(d=>{
+    if(d.error){
+      gl('replybox').classList.add('on');
+      gl('replytx').innerHTML='⚠️ エラー：'+d.error+'<br><br>Olive.42195@gmail.com へご連絡ください。';
+    }
+  }).catch(()=>{});
+}
+
+function resetAI(){
+  Object.keys(SEL).forEach(k=>{SEL[k]=Array.isArray(SEL[k])?[]:''});
+  document.querySelectorAll('.chip.on,.mchip.on').forEach(b=>b.classList.remove('on'));
+  ['aidist','aidur','aigoal','aimemo','aiemail'].forEach(id=>gl(id).value='');
+  IMGS.fill(null);
+  [0,1,2,3].forEach(i=>{const s=gl('sl'+i);s.innerHTML='＋';s.onclick=()=>trigImg(i);});
+  gl('replybox').classList.remove('on');
+  gl('waitbox').classList.remove('on');
+  const btn=gl('aibtn');btn.disabled=false;btn.textContent='📧 AIコーチに相談する（メールで回答）';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── 初期化 ──
 renderWeekPlan();
+renderLib('A');
 </script>
 </body>
 </html>
